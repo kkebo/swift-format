@@ -5,9 +5,9 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-01-06-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-01-06-a-wasm32-unknown-wasi.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: d0bc0992329b5a9772e5c9ab44d5fb90aa568b1886406161ad58b9c53d76bcba
-  TARGET_TRIPLE: wasm32-unknown-wasi
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-01-06-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-01-06-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: ea3e520c88ec0b3e370a5f3910e21d27e31bce562b63b943c1e53ed14764bcac
+  TARGET_TRIPLE: wasm32-unknown-wasip1-threads
   WASMTIME_VESRION: 28.0.0
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
         run: |
           swift build --product swift-format --swift-sdk $TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
           wasm-strip .build/release/swift-format.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext .build/release/swift-format.wasm -o swift-format.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-threads .build/release/swift-format.wasm -o swift-format.wasm
       - name: Upload swift-format.wasm
         uses: actions/upload-artifact@v4
         with:
