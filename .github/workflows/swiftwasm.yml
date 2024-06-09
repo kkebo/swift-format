@@ -45,8 +45,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: swift-format.wasm
-      - run: wasmtime --dir . swift-format.wasm --version
-      - run: wasmtime --dir . swift-format.wasm lint -r .
+      - run: wasmtime --dir . --wasi threads swift-format.wasm --version
+      - run: wasmtime --dir . --wasi threads swift-format.wasm lint -r .
   test:
     runs-on: ubuntu-latest
     container: swiftlang/swift:nightly-main-jammy@sha256:6f37e64ba874adb9be7bc080e8b4c1fd919b239e8d758534d2c20c2d858c9108
@@ -61,4 +61,4 @@ jobs:
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
       - run: swift build -c release --build-tests --swift-sdk $TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
-      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.wasm
+      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE --wasi threads .build/release/swift-formatPackageTests.wasm
