@@ -1327,6 +1327,12 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   }
 
   override func visit(_ node: MacroExpansionDeclSyntax) -> SyntaxVisitorContinueKind {
+    arrangeAttributeList(node.attributes)
+
+    before(
+      node.trailingClosure?.leftBrace,
+      tokens: .break(.same, newlines: .elective(ignoresDiscretionary: true)))
+
     arrangeFunctionCallArgumentList(
       node.arguments,
       leftDelimiter: node.leftParen,
@@ -1453,6 +1459,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   }
 
   override func visit(_ node: IfConfigDeclSyntax) -> SyntaxVisitorContinueKind {
+    // there has to be a break after an #endif
+    after(node.poundEndif, tokens: .break(.same, size: 0))
     return .visitChildren
   }
 
@@ -3171,7 +3179,7 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       return (
         true,
         [
-          .space(size: 2, flexible: true),
+          .space(size: config.spacesBeforeEndOfLineComments, flexible: true),
           .comment(Comment(kind: .line, text: text), wasEndOfLine: true),
           // There must be a break with a soft newline after the comment, but it's impossible to
           // know which kind of break must be used. Adding this newline is deferred until the
