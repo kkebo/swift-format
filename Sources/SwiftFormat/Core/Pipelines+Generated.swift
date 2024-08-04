@@ -37,10 +37,12 @@ class LintPipeline: SyntaxVisitor {
   }
 
   override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
+    visitIfEnabled(AllPublicDeclarationsHaveDocumentation.visit, for: node)
     visitIfEnabled(TypeNamesShouldBeCapitalized.visit, for: node)
     return .visitChildren
   }
   override func visitPost(_ node: ActorDeclSyntax) {
+    onVisitPost(rule: AllPublicDeclarationsHaveDocumentation.self, for: node)
     onVisitPost(rule: TypeNamesShouldBeCapitalized.self, for: node)
   }
 
@@ -76,7 +78,6 @@ class LintPipeline: SyntaxVisitor {
     visitIfEnabled(AllPublicDeclarationsHaveDocumentation.visit, for: node)
     visitIfEnabled(AlwaysUseLowerCamelCase.visit, for: node)
     visitIfEnabled(BeginDocumentationCommentWithOneLineSummary.visit, for: node)
-    visitIfEnabled(DontRepeatTypeInStaticProperties.visit, for: node)
     visitIfEnabled(NoLeadingUnderscores.visit, for: node)
     visitIfEnabled(TypeNamesShouldBeCapitalized.visit, for: node)
     visitIfEnabled(UseTripleSlashForDocumentationComments.visit, for: node)
@@ -86,7 +87,6 @@ class LintPipeline: SyntaxVisitor {
     onVisitPost(rule: AllPublicDeclarationsHaveDocumentation.self, for: node)
     onVisitPost(rule: AlwaysUseLowerCamelCase.self, for: node)
     onVisitPost(rule: BeginDocumentationCommentWithOneLineSummary.self, for: node)
-    onVisitPost(rule: DontRepeatTypeInStaticProperties.self, for: node)
     onVisitPost(rule: NoLeadingUnderscores.self, for: node)
     onVisitPost(rule: TypeNamesShouldBeCapitalized.self, for: node)
     onVisitPost(rule: UseTripleSlashForDocumentationComments.self, for: node)
@@ -181,8 +181,8 @@ class LintPipeline: SyntaxVisitor {
   }
 
   override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
+    visitIfEnabled(AllPublicDeclarationsHaveDocumentation.visit, for: node)
     visitIfEnabled(BeginDocumentationCommentWithOneLineSummary.visit, for: node)
-    visitIfEnabled(DontRepeatTypeInStaticProperties.visit, for: node)
     visitIfEnabled(FullyIndirectEnum.visit, for: node)
     visitIfEnabled(NoLeadingUnderscores.visit, for: node)
     visitIfEnabled(OneCasePerLine.visit, for: node)
@@ -191,8 +191,8 @@ class LintPipeline: SyntaxVisitor {
     return .visitChildren
   }
   override func visitPost(_ node: EnumDeclSyntax) {
+    onVisitPost(rule: AllPublicDeclarationsHaveDocumentation.self, for: node)
     onVisitPost(rule: BeginDocumentationCommentWithOneLineSummary.self, for: node)
-    onVisitPost(rule: DontRepeatTypeInStaticProperties.self, for: node)
     onVisitPost(rule: FullyIndirectEnum.self, for: node)
     onVisitPost(rule: NoLeadingUnderscores.self, for: node)
     onVisitPost(rule: OneCasePerLine.self, for: node)
@@ -202,14 +202,12 @@ class LintPipeline: SyntaxVisitor {
 
   override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
     visitIfEnabled(AvoidRetroactiveConformances.visit, for: node)
-    visitIfEnabled(DontRepeatTypeInStaticProperties.visit, for: node)
     visitIfEnabled(NoAccessLevelOnExtensionDeclaration.visit, for: node)
     visitIfEnabled(UseTripleSlashForDocumentationComments.visit, for: node)
     return .visitChildren
   }
   override func visitPost(_ node: ExtensionDeclSyntax) {
     onVisitPost(rule: AvoidRetroactiveConformances.self, for: node)
-    onVisitPost(rule: DontRepeatTypeInStaticProperties.self, for: node)
     onVisitPost(rule: NoAccessLevelOnExtensionDeclaration.self, for: node)
     onVisitPost(rule: UseTripleSlashForDocumentationComments.self, for: node)
   }
@@ -423,7 +421,6 @@ class LintPipeline: SyntaxVisitor {
   override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
     visitIfEnabled(AllPublicDeclarationsHaveDocumentation.visit, for: node)
     visitIfEnabled(BeginDocumentationCommentWithOneLineSummary.visit, for: node)
-    visitIfEnabled(DontRepeatTypeInStaticProperties.visit, for: node)
     visitIfEnabled(NoLeadingUnderscores.visit, for: node)
     visitIfEnabled(TypeNamesShouldBeCapitalized.visit, for: node)
     visitIfEnabled(UseTripleSlashForDocumentationComments.visit, for: node)
@@ -432,7 +429,6 @@ class LintPipeline: SyntaxVisitor {
   override func visitPost(_ node: ProtocolDeclSyntax) {
     onVisitPost(rule: AllPublicDeclarationsHaveDocumentation.self, for: node)
     onVisitPost(rule: BeginDocumentationCommentWithOneLineSummary.self, for: node)
-    onVisitPost(rule: DontRepeatTypeInStaticProperties.self, for: node)
     onVisitPost(rule: NoLeadingUnderscores.self, for: node)
     onVisitPost(rule: TypeNamesShouldBeCapitalized.self, for: node)
     onVisitPost(rule: UseTripleSlashForDocumentationComments.self, for: node)
@@ -469,7 +465,6 @@ class LintPipeline: SyntaxVisitor {
   override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
     visitIfEnabled(AllPublicDeclarationsHaveDocumentation.visit, for: node)
     visitIfEnabled(BeginDocumentationCommentWithOneLineSummary.visit, for: node)
-    visitIfEnabled(DontRepeatTypeInStaticProperties.visit, for: node)
     visitIfEnabled(NoLeadingUnderscores.visit, for: node)
     visitIfEnabled(TypeNamesShouldBeCapitalized.visit, for: node)
     visitIfEnabled(UseSynthesizedInitializer.visit, for: node)
@@ -479,7 +474,6 @@ class LintPipeline: SyntaxVisitor {
   override func visitPost(_ node: StructDeclSyntax) {
     onVisitPost(rule: AllPublicDeclarationsHaveDocumentation.self, for: node)
     onVisitPost(rule: BeginDocumentationCommentWithOneLineSummary.self, for: node)
-    onVisitPost(rule: DontRepeatTypeInStaticProperties.self, for: node)
     onVisitPost(rule: NoLeadingUnderscores.self, for: node)
     onVisitPost(rule: TypeNamesShouldBeCapitalized.self, for: node)
     onVisitPost(rule: UseSynthesizedInitializer.self, for: node)
@@ -568,6 +562,7 @@ class LintPipeline: SyntaxVisitor {
     visitIfEnabled(AllPublicDeclarationsHaveDocumentation.visit, for: node)
     visitIfEnabled(AlwaysUseLowerCamelCase.visit, for: node)
     visitIfEnabled(BeginDocumentationCommentWithOneLineSummary.visit, for: node)
+    visitIfEnabled(DontRepeatTypeInStaticProperties.visit, for: node)
     visitIfEnabled(NeverUseImplicitlyUnwrappedOptionals.visit, for: node)
     visitIfEnabled(UseTripleSlashForDocumentationComments.visit, for: node)
     return .visitChildren
@@ -576,6 +571,7 @@ class LintPipeline: SyntaxVisitor {
     onVisitPost(rule: AllPublicDeclarationsHaveDocumentation.self, for: node)
     onVisitPost(rule: AlwaysUseLowerCamelCase.self, for: node)
     onVisitPost(rule: BeginDocumentationCommentWithOneLineSummary.self, for: node)
+    onVisitPost(rule: DontRepeatTypeInStaticProperties.self, for: node)
     onVisitPost(rule: NeverUseImplicitlyUnwrappedOptionals.self, for: node)
     onVisitPost(rule: UseTripleSlashForDocumentationComments.self, for: node)
   }

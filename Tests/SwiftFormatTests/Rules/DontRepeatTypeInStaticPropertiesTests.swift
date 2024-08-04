@@ -32,6 +32,9 @@ final class DontRepeatTypeInStaticPropertiesTests: LintOrFormatRuleTestCase {
       extension URLSession {
         class var 8️⃣sharedSession: URLSession
       }
+      public actor Cookie {
+        static let 9️⃣chocolateChipCookie: Cookie
+      }
       """,
       findings: [
         FindingSpec("1️⃣", message: "remove the suffix 'Color' from the name of the variable 'redColor'"),
@@ -42,6 +45,7 @@ final class DontRepeatTypeInStaticPropertiesTests: LintOrFormatRuleTestCase {
         FindingSpec("6️⃣", message: "remove the suffix 'Game' from the name of the variable 'basketballGame'"),
         FindingSpec("7️⃣", message: "remove the suffix 'Game' from the name of the variable 'baseballGame'"),
         FindingSpec("8️⃣", message: "remove the suffix 'Session' from the name of the variable 'sharedSession'"),
+        FindingSpec("9️⃣", message: "remove the suffix 'Cookie' from the name of the variable 'chocolateChipCookie'"),
       ]
     )
   }
@@ -71,4 +75,22 @@ final class DontRepeatTypeInStaticPropertiesTests: LintOrFormatRuleTestCase {
       ]
     )
   }
+
+
+  func testIgnoreSingleDecl() {
+    assertLint(
+      DontRepeatTypeInStaticProperties.self,
+        """
+        struct Foo {
+          // swift-format-ignore: DontRepeatTypeInStaticProperties
+          static let defaultFoo: Int
+          static let 1️⃣alternateFoo: Int
+        }
+        """,
+      findings: [
+        FindingSpec("1️⃣", message: "remove the suffix 'Foo' from the name of the variable 'alternateFoo'"),
+      ]
+    )
+  }
+
 }
