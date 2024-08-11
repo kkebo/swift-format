@@ -6,6 +6,7 @@ on:
     branches: ["wasm32-wasi"]
 env:
   SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-08-11-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-08-11-a-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: 4bd7ce303c22de1728bfc667c024a43e3d6f916b3598d229311e65760ce9006e
   TARGET_TRIPLE: wasm32-unknown-wasi
 jobs:
   build:
@@ -18,7 +19,7 @@ jobs:
       - name: Install tools
         run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen
       - run: swift --version
-      - run: swift sdk install $SWIFT_SDK_URL
+      - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
       - name: Build
         run: |
           swift build --product swift-format --swift-sdk $TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
@@ -39,6 +40,6 @@ jobs:
       - uses: bytecodealliance/actions/wasmtime/setup@v1
       - run: swift --version
       - run: wasmtime -V
-      - run: swift sdk install $SWIFT_SDK_URL
+      - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
       - run: swift build -c release --build-tests --swift-sdk $TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
       - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.wasm
