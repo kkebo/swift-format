@@ -707,6 +707,9 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   }
 
   override func visit(_ node: DoStmtSyntax) -> SyntaxVisitorContinueKind {
+    if node.throwsClause != nil {
+      after(node.doKeyword, tokens: .break(.same, size: 1))
+    }
     arrangeBracesAndContents(of: node.body, contentsKeyPath: \.statements)
     return .visitChildren
   }
@@ -1324,6 +1327,12 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   }
 
   override func visit(_ node: MacroExpansionDeclSyntax) -> SyntaxVisitorContinueKind {
+    arrangeAttributeList(node.attributes)
+
+    before(
+      node.trailingClosure?.leftBrace,
+      tokens: .break(.same, newlines: .elective(ignoresDiscretionary: true)))
+
     arrangeFunctionCallArgumentList(
       node.arguments,
       leftDelimiter: node.leftParen,
@@ -1450,6 +1459,8 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   }
 
   override func visit(_ node: IfConfigDeclSyntax) -> SyntaxVisitorContinueKind {
+    // there has to be a break after an #endif
+    after(node.poundEndif, tokens: .break(.same, size: 0))
     return .visitChildren
   }
 
