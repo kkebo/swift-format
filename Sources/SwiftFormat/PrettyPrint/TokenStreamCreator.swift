@@ -15,7 +15,7 @@ import SwiftOperators
 import SwiftSyntax
 
 fileprivate extension AccessorBlockSyntax {
-  /// Assuming that the accessor only contains an implicit getter (i.e. no 
+  /// Assuming that the accessor only contains an implicit getter (i.e. no
   /// `get` or `set`), return the code block items in that getter.
   var getterCodeBlockItems: CodeBlockItemListSyntax {
     guard case .getter(let codeBlockItemList) = self.accessors else {
@@ -527,9 +527,9 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   /// Arranges the `async` and `throws` effect specifiers of a function or accessor declaration.
   private func arrangeEffectSpecifiers<Node: EffectSpecifiersSyntax>(_ node: Node) {
     before(node.asyncSpecifier, tokens: .break)
-    before(node.throwsSpecifier, tokens: .break)
+    before(node.throwsClause?.throwsSpecifier, tokens: .break)
     // Keep them together if both `async` and `throws` are present.
-    if let asyncSpecifier = node.asyncSpecifier, let throwsSpecifier = node.throwsSpecifier {
+    if let asyncSpecifier = node.asyncSpecifier, let throwsSpecifier = node.throwsClause?.throwsSpecifier {
       before(asyncSpecifier, tokens: .open)
       after(throwsSpecifier, tokens: .close)
     }
@@ -1437,9 +1437,9 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
 
   override func visit(_ node: ReturnClauseSyntax) -> SyntaxVisitorContinueKind {
     if node.parent?.is(FunctionTypeSyntax.self) ?? false {
-      // `FunctionTypeSyntax` used to not use `ReturnClauseSyntax` and had 
-      // slightly different formatting behavior than the normal 
-      // `ReturnClauseSyntax`. To maintain the previous formatting behavior, 
+      // `FunctionTypeSyntax` used to not use `ReturnClauseSyntax` and had
+      // slightly different formatting behavior than the normal
+      // `ReturnClauseSyntax`. To maintain the previous formatting behavior,
       // add a special case.
       before(node.arrow, tokens: .break)
       before(node.type.firstToken(viewMode: .sourceAccurate), tokens: .break)
@@ -1819,7 +1819,7 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
   override func visit(_ node: OriginallyDefinedInAttributeArgumentsSyntax) -> SyntaxVisitorContinueKind {
     after(node.colon.lastToken(viewMode: .sourceAccurate), tokens: .break(.same, size: 1))
     after(node.comma.lastToken(viewMode: .sourceAccurate), tokens: .break(.same, size: 1))
-      return .visitChildren
+    return .visitChildren
   }
 
   override func visit(_ node: DocumentationAttributeArgumentSyntax) -> SyntaxVisitorContinueKind {
@@ -2302,9 +2302,11 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
 
   override func visit(_ node: AttributedTypeSyntax) -> SyntaxVisitorContinueKind {
     arrangeAttributeList(node.attributes)
-    after(
-      node.specifier,
-      tokens: .break(.continue, newlines: .elective(ignoresDiscretionary: true)))
+    for specifier in node.specifiers {
+      after(
+        specifier.firstToken(viewMode: .sourceAccurate),
+        tokens: .break(.continue, newlines: .elective(ignoresDiscretionary: true)))
+    }
     return .visitChildren
   }
 
@@ -2446,6 +2448,13 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       if !node.segments.isEmpty {
         before(node.closingQuote, tokens: .break(breakKind, newlines: .hard(count: 1)))
       }
+      if shouldFormatterIgnore(node: Syntax(node)) {
+        appendFormatterIgnored(node: Syntax(node))
+        // Mirror the tokens we'd normally append on '"""'
+        appendTrailingTrivia(node.closingQuote)
+        appendAfterTokensAndTrailingComments(node.closingQuote)
+        return .skipChildren
+      }
     }
     return .visitChildren
   }
@@ -2460,17 +2469,69 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
     return .visitChildren
   }
 
-  override func visit(_ node: StringSegmentSyntax) -> SyntaxVisitorContinueKind {
-    // Looks up the correct break kind based on prior context.
-    func breakKind() -> BreakKind {
-      if let stringLiteralSegments = node.parent?.as(StringLiteralSegmentListSyntax.self),
-        let stringLiteralExpr = stringLiteralSegments.parent?.as(StringLiteralExprSyntax.self)
-      {
-        return pendingMultilineStringBreakKinds[stringLiteralExpr, default: .same]
-      } else {
-        return .same
+  // Insert an `.escaped` break token after each series of whitespace in a substring
+  private func emitMultilineSegmentTextTokens(breakKind: BreakKind, segment: Substring) {
+    var currentWord = [Unicode.Scalar]()
+    var currentBreak = [Unicode.Scalar]()
+
+    func emitWord() {
+      if !currentWord.isEmpty {
+        var str = ""
+        str.unicodeScalars.append(contentsOf: currentWord)
+        appendToken(.syntax(str))
+        currentWord = []
       }
     }
+    func emitBreak() {
+      if !currentBreak.isEmpty {
+        // We append this as a syntax, instead of a `.space`, so that it is always included in the output.
+        var str = ""
+        str.unicodeScalars.append(contentsOf: currentBreak)
+        appendToken(.syntax(str))
+        appendToken(.break(breakKind, size: 0, newlines: .escaped))
+        currentBreak = []
+      }
+    }
+
+    for scalar in segment.unicodeScalars {
+      // We don't have to worry about newlines occurring in segments.
+      // Either a segment will end in a newline character or the newline will be in trivia.
+      if scalar.properties.isWhitespace {
+        emitWord()
+        currentBreak.append(scalar)
+      } else {
+        emitBreak()
+        currentWord.append(scalar)
+      }
+    }
+
+    // Only one of these will actually do anything based on whether our last char was whitespace or not.
+    emitWord()
+    emitBreak()
+  }
+
+  override func visit(_ node: StringSegmentSyntax) -> SyntaxVisitorContinueKind {
+    // Looks up the correct break kind based on prior context.
+    let stringLiteralParent =
+      node.parent?
+        .as(StringLiteralSegmentListSyntax.self)?
+        .parent?
+        .as(StringLiteralExprSyntax.self)
+    let breakKind = stringLiteralParent.map {
+      pendingMultilineStringBreakKinds[$0, default: .same]
+    } ?? .same
+
+    let isMultiLineString =
+      stringLiteralParent?.openingQuote.tokenKind == .multilineStringQuote
+      // We don't reflow raw strings, so treat them as if they weren't multiline
+      && stringLiteralParent?.openingPounds == nil
+
+    let emitSegmentTextTokens =
+      // If our configure reflow behavior is never, always use the single line emit segment text tokens.
+      isMultiLineString && !config.reflowMultilineStringLiterals.isNever
+        ? { (segment) in  self.emitMultilineSegmentTextTokens(breakKind: breakKind, segment: segment) }
+        // For single line strings we don't allow line breaks, so emit the string as a single `.syntax` token
+        : { (segment) in self.appendToken(.syntax(String(segment))) }
 
     let segmentText = node.content.text
     if segmentText.hasSuffix("\n") {
@@ -2478,20 +2539,22 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
       // append the rest of the string, followed by a break if it's not the last line before the
       // closing quotes. (The `StringLiteralExpr` above does the closing break.)
       let remainder = node.content.text.dropLast()
+
       if !remainder.isEmpty {
-        appendToken(.syntax(String(remainder)))
+        // Replace each space in the segment text by an elective break of size 1
+        emitSegmentTextTokens(remainder)
       }
-      appendToken(.break(breakKind(), newlines: .hard(count: 1)))
+      appendToken(.break(breakKind, newlines: .hard(count: 1)))
     } else {
-      appendToken(.syntax(segmentText))
+      emitSegmentTextTokens(segmentText[...])
     }
 
-    if node.trailingTrivia.containsBackslashes {
+    if node.trailingTrivia.containsBackslashes && !config.reflowMultilineStringLiterals.isAlways {
       // Segments with trailing backslashes won't end with a literal newline; the backslash is
       // considered trivia. To preserve the original text and wrapping, we need to manually render
       // the backslash and a break into the token stream.
       appendToken(.syntax("\\"))
-      appendToken(.break(breakKind(), newlines: .hard(count: 1)))
+      appendToken(.break(breakKind, newlines: .hard(count: 1)))
     }
     return .skipChildren
   }
@@ -2866,8 +2929,16 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
         var shouldExtractTrailingComment = false
         if wasLineComment && !hasAppendedTrailingComment {
           switch afterToken {
-          case .break, .printerControl: shouldExtractTrailingComment = true
-          default: break
+          case let .break(kind, _, _):
+            if case let .close(mustBreak) = kind {
+              shouldExtractTrailingComment = mustBreak
+            } else {
+              shouldExtractTrailingComment = true
+            }
+          case .printerControl: 
+            shouldExtractTrailingComment = true
+          default: 
+            break
           }
         }
         if shouldExtractTrailingComment {
@@ -2894,19 +2965,24 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
     if let attributes = attributes {
       let behavior: NewlineBehavior = separateByLineBreaks ? .hard : .elective
       before(attributes.firstToken(viewMode: .sourceAccurate), tokens: .open)
-      for element in attributes.dropLast() {
-        if let ifConfig = element.as(IfConfigDeclSyntax.self) {
+      if attributes.dropLast().isEmpty,
+         let ifConfig = attributes.first?.as(IfConfigDeclSyntax.self) {
+        for clause in ifConfig.clauses {
+          if let nestedAttributes = AttributeListSyntax(clause.elements) {
+            arrangeAttributeList(nestedAttributes, suppressFinalBreak: true, separateByLineBreaks: separateByLineBreaks)
+          }
+        }
+      } else {
+        for element in attributes.dropLast() {
+          if let ifConfig = element.as(IfConfigDeclSyntax.self) {
             for clause in ifConfig.clauses {
-                if let nestedAttributes = AttributeListSyntax(clause.elements) {
-                    arrangeAttributeList(
-                        nestedAttributes,
-                        suppressFinalBreak: true,
-                        separateByLineBreaks: separateByLineBreaks
-                    )
-                }
+              if let nestedAttributes = AttributeListSyntax(clause.elements) {
+                arrangeAttributeList(nestedAttributes, suppressFinalBreak: true, separateByLineBreaks: separateByLineBreaks)
+              }
             }
-        } else {
+          } else {
             after(element.lastToken(viewMode: .sourceAccurate), tokens: .break(.same, newlines: behavior))
+          }
         }
       }
       var afterAttributeTokens = [Token.close]
@@ -3194,18 +3270,19 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
         true,
         [
           .space(size: config.spacesBeforeEndOfLineComments, flexible: true),
-          .comment(Comment(kind: .line, text: text), wasEndOfLine: true),
+          .comment(Comment(kind: .line, leadingIndent: nil, text: text), wasEndOfLine: true),
           // There must be a break with a soft newline after the comment, but it's impossible to
           // know which kind of break must be used. Adding this newline is deferred until the
           // comment is added to the token stream.
-      ])
+        ]
+      )
 
     case .blockComment(let text):
       return (
         false,
         [
           .space(size: 1, flexible: true),
-          .comment(Comment(kind: .block, text: text), wasEndOfLine: false),
+          .comment(Comment(kind: .block, leadingIndent: nil, text: text), wasEndOfLine: false),
           // We place a size-0 break after the comment to allow a discretionary newline after
           // the comment if the user places one here but the comment is otherwise adjacent to a
           // text token.
@@ -3294,24 +3371,29 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
     // example, even if discretionary newlines are discarded). This is the case when the preceding
     // trivia was a line comment or garbage text.
     var requiresNextNewline = false
+    // Tracking whether or not the last piece was leading indentation. A newline is considered
+    // a 0-space indentation; used for nesting/un-nesting block comments during formatting.
+    var leadingIndent: Indent? = nil
 
     for (index, piece) in trivia.enumerated() {
       if let cutoff = cutoffIndex, index == cutoff { break }
+
       switch piece {
       case .lineComment(let text):
         if index > 0 || isStartOfFile {
           generateEnableFormattingIfNecessary(position ..< position + piece.sourceLength)
-          appendToken(.comment(Comment(kind: .line, text: text), wasEndOfLine: false))
+          appendToken(.comment(Comment(kind: .line, leadingIndent: leadingIndent, text: text), wasEndOfLine: false))
           generateDisableFormattingIfNecessary(position + piece.sourceLength)
           appendNewlines(.soft)
           isStartOfFile = false
         }
         requiresNextNewline = true
+        leadingIndent = nil
 
       case .blockComment(let text):
         if index > 0 || isStartOfFile {
           generateEnableFormattingIfNecessary(position ..< position + piece.sourceLength)
-          appendToken(.comment(Comment(kind: .block, text: text), wasEndOfLine: false))
+          appendToken(.comment(Comment(kind: .block, leadingIndent: leadingIndent, text: text), wasEndOfLine: false))
           generateDisableFormattingIfNecessary(position + piece.sourceLength)
           // There is always a break after the comment to allow a discretionary newline after it.
           var breakSize = 0
@@ -3325,24 +3407,28 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
           isStartOfFile = false
         }
         requiresNextNewline = false
+        leadingIndent = nil
 
       case .docLineComment(let text):
         generateEnableFormattingIfNecessary(position ..< position + piece.sourceLength)
-        appendToken(.comment(Comment(kind: .docLine, text: text), wasEndOfLine: false))
+        appendToken(.comment(Comment(kind: .docLine, leadingIndent: leadingIndent, text: text), wasEndOfLine: false))
         generateDisableFormattingIfNecessary(position + piece.sourceLength)
         appendNewlines(.soft)
         isStartOfFile = false
         requiresNextNewline = true
+        leadingIndent = nil
 
       case .docBlockComment(let text):
         generateEnableFormattingIfNecessary(position ..< position + piece.sourceLength)
-        appendToken(.comment(Comment(kind: .docBlock, text: text), wasEndOfLine: false))
+        appendToken(.comment(Comment(kind: .docBlock, leadingIndent: leadingIndent, text: text), wasEndOfLine: false))
         generateDisableFormattingIfNecessary(position + piece.sourceLength)
         appendNewlines(.soft)
         isStartOfFile = false
         requiresNextNewline = false
+        leadingIndent = nil
 
       case .newlines(let count), .carriageReturns(let count), .carriageReturnLineFeeds(let count):
+        leadingIndent = .spaces(0)
         guard !isStartOfFile else { break }
 
         if requiresNextNewline ||
@@ -3372,9 +3458,17 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
         let isBOM = text == "\u{feff}"
         requiresNextNewline = !isBOM
         isStartOfFile = isStartOfFile && isBOM
+        leadingIndent = nil
 
-      default:
-        break
+      case .backslashes, .formfeeds, .pounds, .verticalTabs:
+        leadingIndent = nil
+
+      case .spaces(let n):
+        guard leadingIndent == .spaces(0) else { break }
+        leadingIndent = .spaces(n)
+      case .tabs(let n):
+        guard leadingIndent == .spaces(0) else { break }
+        leadingIndent = .tabs(n)
       }
       position += piece.sourceLength
     }
@@ -3470,12 +3564,18 @@ fileprivate final class TokenStreamCreator: SyntaxVisitor {
 
     if let last = tokens.last {
       switch (last, token) {
+      case (.break(_, _, .escaped), _), (_, .break(_, _, .escaped)):
+        lastBreakIndex = tokens.endIndex
+        // Don't allow merging for .escaped breaks
+        canMergeNewlinesIntoLastBreak = false
+        tokens.append(token)
+        return
       case (.break(let breakKind, _, .soft(1, _)), .comment(let c2, _))
         where breakAllowsCommentMerge(breakKind) && (c2.kind == .docLine || c2.kind == .line):
         // we are search for the pattern of [line comment] - [soft break 1] - [line comment]
         // where the comment type is the same; these can be merged into a single comment
         if let nextToLast = tokens.dropLast().last,
-          case let .comment(c1, false) = nextToLast, 
+          case let .comment(c1, false) = nextToLast,
           c1.kind == c2.kind
         {
           var mergedComment = c1
@@ -4274,6 +4374,10 @@ extension NewlineBehavior {
       // `lhs` is either also elective or a required newline, which overwrites elective.
       return lhs
 
+    case (.escaped, _):
+      return rhs
+    case (_, .escaped):
+      return lhs
     case (.soft(let lhsCount, let lhsDiscretionary), .soft(let rhsCount, let rhsDiscretionary)):
       let mergedCount: Int
       if lhsDiscretionary && rhsDiscretionary {
