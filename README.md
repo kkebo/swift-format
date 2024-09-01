@@ -22,7 +22,7 @@ The checked items are currently supported. The others are planned to be supporte
 
 ## Restrictions
 
-- `-p` and `--parallel`  options are not implemented
+- `-p` and `--parallel` options are not implemented
 
 # swift-format
 
