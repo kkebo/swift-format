@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
-          version: "24.0.0"
+          version: "25.0.1"
       - run: swift --version
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
