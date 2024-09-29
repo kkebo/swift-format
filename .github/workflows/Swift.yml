@@ -5,13 +5,13 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-09-07-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-09-07-a-wasm32-unknown-wasi.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: dd43e067cccee3051b5fee16b5b2850943e57aea216948b4934a97b11901bfc2
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-09-26-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-09-26-a-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: 34c53bac6f41502f26056fd14bbf4757eca2cb93fdab089dd25449bc17cbc3c8
   TARGET_TRIPLE: wasm32-unknown-wasi
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:c47105d85d7d62b5e746ad1374fed57d5ede38b4819d9a493d75b382ea3a2021
+    container: swiftlang/swift:nightly-main-jammy@sha256:61db5d799a789a4808061fc35b85098959f09a80a4e47136a58a52469e8cd2bb
     env:
       STACK_SIZE: 524288
     steps:
@@ -32,7 +32,7 @@ jobs:
           path: swift-format.wasm
   test:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:c47105d85d7d62b5e746ad1374fed57d5ede38b4819d9a493d75b382ea3a2021
+    container: swiftlang/swift:nightly-main-jammy@sha256:61db5d799a789a4808061fc35b85098959f09a80a4e47136a58a52469e8cd2bb
     env:
       STACK_SIZE: 4194304
     steps:
