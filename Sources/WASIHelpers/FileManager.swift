@@ -18,7 +18,7 @@ extension FileManager {
     at url: URL,
     includingPropertiesForKeys keys: [URLResourceKey]?,
     options mask: FileManager.DirectoryEnumerationOptions = [],
-    errorHandler handler: (/* @escaping */ (URL, Error) -> Bool)? = nil
+    errorHandler handler: ( /* @escaping */(URL, Error) -> Bool)? = nil
   ) -> FileManager.WASIDirectoryEnumerator? {
     // TODO: Use arguments
     .init(at: url)
@@ -56,7 +56,8 @@ extension FileManager {
           guard filename != "." && filename != ".." else { continue }
           let child = url.appendingPathComponent(filename)
           var status = stat()
-          if child.withUnsafeFileSystemRepresentation({ stat($0, &status) }) == 0, (status.st_mode & S_IFMT) == S_IFDIR {
+          if child.withUnsafeFileSystemRepresentation({ stat($0, &status) }) == 0, (status.st_mode & S_IFMT) == S_IFDIR
+          {
             appendDirectoryPointer(of: child)
             return child
           } else {

@@ -148,16 +148,16 @@ class Frontend {
     )
 
     if parallel {
-#if !os(WASI)
+      #if !os(WASI)
       let filesToProcess =
         FileIterator(urls: urls, followSymlinks: lintFormatOptions.followSymlinks)
         .compactMap(openAndPrepareFile)
       DispatchQueue.concurrentPerform(iterations: filesToProcess.count) { index in
         processFile(filesToProcess[index])
       }
-#else
+      #else
       fatalError("not implemented")
-#endif
+      #endif
     } else {
       FileIterator(urls: urls, followSymlinks: lintFormatOptions.followSymlinks)
         .lazy

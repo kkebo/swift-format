@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+
 #if os(WASI)
 import WASIHelpers
 #endif
@@ -92,19 +93,19 @@ public struct FileIterator: Sequence, IteratorProtocol {
           fallthrough
 
         case .typeDirectory:
-#if !os(WASI)
+          #if !os(WASI)
           dirIterator = FileManager.default.enumerator(
             at: next,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
           )
-#else
+          #else
           dirIterator = FileManager.default.enumeratorWASI(
             at: next,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
           )
-#endif
+          #endif
           currentDirectory = next
 
         default:
