@@ -18,10 +18,10 @@ extension FileManager {
     at url: URL,
     includingPropertiesForKeys keys: [URLResourceKey]?,
     options mask: FileManager.DirectoryEnumerationOptions = [],
-    errorHandler handler: (/* @escaping */ (URL, Error) -> Bool)? = nil
+    errorHandler handler: ( /* @escaping */(URL, Error) -> Bool)? = nil
   ) -> FileManager.WASIDirectoryEnumerator? {
     // TODO: Use arguments
-    .init(at: url)
+    .init(at: url, options: mask)
   }
 }
 
@@ -29,8 +29,10 @@ extension FileManager {
   /// Thread-unsafe directory enumerator.
   public class WASIDirectoryEnumerator: Sequence, IteratorProtocol {
     private var dpStack = [(URL, OpaquePointer)]()
+    private var options: FileManager.DirectoryEnumerationOptions
 
-    fileprivate init(at url: URL) {
+    fileprivate init(at url: URL, options: FileManager.DirectoryEnumerationOptions) {
+      self.options = options
       appendDirectoryPointer(of: url)
     }
 
@@ -54,9 +56,13 @@ extension FileManager {
             return String(cString: d_namePtr.assumingMemoryBound(to: CChar.self))
           }
           guard filename != "." && filename != ".." else { continue }
+          if options.contains(.skipsHiddenFiles) {
+            guard !filename.hasPrefix(".") else { continue }
+          }
           let child = url.appendingPathComponent(filename)
           var status = stat()
-          if child.withUnsafeFileSystemRepresentation({ stat($0, &status) }) == 0, (status.st_mode & S_IFMT) == S_IFDIR {
+          if child.withUnsafeFileSystemRepresentation({ stat($0, &status) }) == 0, (status.st_mode & S_IFMT) == S_IFDIR
+          {
             appendDirectoryPointer(of: child)
             return child
           } else {

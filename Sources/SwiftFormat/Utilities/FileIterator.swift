@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
+
 #if os(WASI)
 import WASIHelpers
 #endif
@@ -23,7 +24,7 @@ private typealias DirectoryEnumerator = FileManager.WASIDirectoryEnumerator
 
 /// Iterator for looping over lists of files and directories. Directories are automatically
 /// traversed recursively, and we check for files with a ".swift" extension.
-@_spi(Testing)
+@_spi(Internal)
 public struct FileIterator: Sequence, IteratorProtocol {
 
   /// List of file and directory URLs to iterate over.
@@ -92,17 +93,19 @@ public struct FileIterator: Sequence, IteratorProtocol {
           fallthrough
 
         case .typeDirectory:
-#if !os(WASI)
+          #if !os(WASI)
           dirIterator = FileManager.default.enumerator(
             at: next,
             includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles])
-#else
+            options: [.skipsHiddenFiles]
+          )
+          #else
           dirIterator = FileManager.default.enumeratorWASI(
             at: next,
             includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles])
-#endif
+            options: [.skipsHiddenFiles]
+          )
+          #endif
           currentDirectory = next
 
         default:
@@ -129,6 +132,14 @@ public struct FileIterator: Sequence, IteratorProtocol {
       guard let item = dirIterator?.nextObject() as? URL else {
         break
       }
+      #if os(Windows)
+      // Windows does not consider files and directories starting with `.` as hidden but we don't want to traverse
+      // into eg. `.build`. Manually skip any items starting with `.`.
+      if item.lastPathComponent.hasPrefix(".") {
+        dirIterator?.skipDescendants()
+        continue
+      }
+      #endif
 
       guard item.lastPathComponent.hasSuffix(fileSuffix), let fileType = fileType(at: item) else {
         continue

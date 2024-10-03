@@ -10,10 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
+
 #if !os(WASI)
 import Dispatch
 #endif
-import Foundation
 
 /// Manages printing of diagnostics to standard error.
 final class StderrDiagnosticPrinter {
@@ -40,10 +41,10 @@ final class StderrDiagnosticPrinter {
     case reset = "0"
   }
 
-#if !os(WASI)
+  #if !os(WASI)
   /// The queue used to synchronize printing uninterrupted diagnostic messages.
   private let printQueue = DispatchQueue(label: "com.apple.swift-format.StderrDiagnosticPrinter")
-#endif
+  #endif
 
   /// Indicates whether colors should be used when printing diagnostics.
   private let useColors: Bool
@@ -62,13 +63,13 @@ final class StderrDiagnosticPrinter {
 
   /// Prints a diagnostic to standard error.
   func printDiagnostic(_ diagnostic: Diagnostic) {
-#if !os(WASI)
+    #if !os(WASI)
     printQueue.sync {
       _printDiagnostic(diagnostic)
     }
-#else
+    #else
     _printDiagnostic(diagnostic)
-#endif
+    #endif
   }
 
   /// Prints a diagnostic to standard error.
