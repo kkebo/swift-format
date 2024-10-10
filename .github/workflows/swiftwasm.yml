@@ -1,4 +1,4 @@
-name: Swift
+name: SwiftWasm
 on:
   push:
     branches: ["wasm32-wasi-release/6.0"]
