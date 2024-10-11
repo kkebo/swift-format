@@ -1,6 +1,6 @@
 # kkebo/swift-format
 
-The WebAssembly (WASI) version of `swift-format`.
+The WebAssembly (WASI) version of `swift-format`. This project's goal is to be merged into [swiftlang/swift-format](https://github.com/swiftlang/swift-format).
 
 ## Download
 
@@ -17,8 +17,9 @@ The checked items are currently supported. The others are planned to be supporte
 
 - [x] [a-Shell (`wasm` and `wasm3`)](https://github.com/holzschu/a-shell?tab=readme-ov-file) (iOS, iPadOS)
 - [x] [Wasmtime](https://wasmtime.dev)
-- [ ] [Wasmer](https://wasmer.io)
-- [ ] [WasmKit](https://github.com/swiftwasm/WasmKit)
+- [x] [Wasmer](https://wasmer.io)
+- [x] [WasmKit](https://github.com/swiftwasm/WasmKit)
+- [x] [WasmEdge](https://wasmedge.org)
 
 ## Restrictions
 
