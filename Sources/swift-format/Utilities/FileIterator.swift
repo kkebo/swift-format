@@ -15,12 +15,6 @@ import Foundation
 import WASIHelpers
 #endif
 
-#if !os(WASI)
-private typealias DirectoryEnumerator = FileManager.DirectoryEnumerator
-#else
-private typealias DirectoryEnumerator = FileManager.WASIDirectoryEnumerator
-#endif
-
 /// Iterator for looping over lists of files and directories. Directories are automatically
 /// traversed recursively, and we check for files with a ".swift" extension.
 @_spi(Testing)
@@ -37,7 +31,7 @@ public struct FileIterator: Sequence, IteratorProtocol {
   private var urlIterator: Array<URL>.Iterator
 
   /// Iterator for recursing through directories.
-  private var dirIterator: DirectoryEnumerator? = nil
+  private var dirIterator: FileManager.DirectoryEnumerator? = nil
 
   /// The current working directory of the process, which is used to relativize URLs of files found
   /// during iteration.

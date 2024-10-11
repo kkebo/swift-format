@@ -1,4 +1,4 @@
-name: Swift
+name: SwiftWasm
 on:
   push:
     branches: ["wasm32-wasi-release/6.0"]
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
-          version: "25.0.1"
+          version: "25.0.2"
       - run: swift --version
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
