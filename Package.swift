@@ -47,7 +47,7 @@ let package = Package(
 
     .target(
       name: "SwiftFormat",
-      dependencies: [
+      dependencies: omittingExternalDependenciesIfNecessary([
         .target(name: "WASIHelpers", condition: .when(platforms: [.wasi])),
         .product(name: "Markdown", package: "swift-markdown"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
@@ -55,15 +55,15 @@ let package = Package(
         .product(name: "SwiftOperators", package: "swift-syntax"),
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftParserDiagnostics", package: "swift-syntax"),
-      ],
+      ]),
       exclude: ["CMakeLists.txt"]
     ),
     .target(
       name: "_SwiftFormatTestSupport",
-      dependencies: [
+      dependencies: omittingExternalDependenciesIfNecessary([
         "SwiftFormat",
         .product(name: "SwiftOperators", package: "swift-syntax"),
-      ]
+      ])
     ),
     .target(
       name: "WASIHelpers"
@@ -97,36 +97,34 @@ let package = Package(
     .executableTarget(
       name: "generate-swift-format",
       dependencies: [
-        "SwiftFormat",
-        .product(name: "SwiftSyntax", package: "swift-syntax"),
-        .product(name: "SwiftParser", package: "swift-syntax"),
+        "SwiftFormat"
       ]
     ),
     .executableTarget(
       name: "swift-format",
-      dependencies: [
+      dependencies: omittingExternalDependenciesIfNecessary([
         "_SwiftFormatInstructionCounter",
         "SwiftFormat",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftParser", package: "swift-syntax"),
-      ],
+      ]),
       exclude: ["CMakeLists.txt"],
       linkerSettings: swiftformatLinkSettings
     ),
 
     .testTarget(
       name: "SwiftFormatPerformanceTests",
-      dependencies: [
+      dependencies: omittingExternalDependenciesIfNecessary([
         "SwiftFormat",
         "_SwiftFormatTestSupport",
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftParser", package: "swift-syntax"),
-      ]
+      ])
     ),
     .testTarget(
       name: "SwiftFormatTests",
-      dependencies: [
+      dependencies: omittingExternalDependenciesIfNecessary([
         "SwiftFormat",
         "_SwiftFormatTestSupport",
         .product(name: "Markdown", package: "swift-markdown"),
@@ -134,7 +132,7 @@ let package = Package(
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
         .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-      ]
+      ])
     ),
   ]
 )
@@ -153,10 +151,28 @@ var installAction: Bool { hasEnvironmentVariable("SWIFTFORMAT_CI_INSTALL") }
 /// remote dependency.
 var useLocalDependencies: Bool { hasEnvironmentVariable("SWIFTCI_USE_LOCAL_DEPS") }
 
+var omitExternalDependencies: Bool { hasEnvironmentVariable("SWIFTFORMAT_OMIT_EXTERNAL_DEPENDENCIES") }
+
+func omittingExternalDependenciesIfNecessary(
+  _ dependencies: [Target.Dependency]
+) -> [Target.Dependency] {
+  guard omitExternalDependencies else {
+    return dependencies
+  }
+  return dependencies.filter { dependency in
+    if case .productItem(_, let package, _, _) = dependency {
+      return package == nil
+    }
+    return true
+  }
+}
+
 // MARK: - Dependencies
 
 var dependencies: [Package.Dependency] {
-  if useLocalDependencies {
+  if omitExternalDependencies {
+    return []
+  } else if useLocalDependencies {
     return [
       .package(path: "../swift-argument-parser"),
       .package(path: "../swift-markdown"),
