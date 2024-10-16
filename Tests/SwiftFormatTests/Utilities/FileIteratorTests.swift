@@ -17,9 +17,7 @@ final class FileIteratorTests: XCTestCase {
     try touch("project/real2.swift")
     try touch("project/.hidden.swift")
     try touch("project/.build/generated.swift")
-    #if !os(WASI)  // FIXME: Remove this #if
     try symlink("project/link.swift", to: "project/.hidden.swift")
-    #endif
   }
 
   override func tearDownWithError() throws {
@@ -28,7 +26,7 @@ final class FileIteratorTests: XCTestCase {
     try FileManager.default.removeItem(at: tmpURL("project/real2.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.hidden.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/generated.swift"))
-    // FIXME: try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/"))
     try FileManager.default.removeItem(at: tmpURL("project/"))
     try FileManager.default.removeItem(at: tmpdir)
@@ -46,17 +44,11 @@ final class FileIteratorTests: XCTestCase {
 
   func testFollowSymlinks() {
     let seen = allFilesSeen(iteratingOver: [tmpdir], followSymlinks: true)
-    #if os(WASI)
-    XCTAssertEqual(seen.count, 2)
-    #else
     XCTAssertEqual(seen.count, 3)
-    #endif
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/real1.swift") })
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/real2.swift") })
-    #if !os(WASI)  // FIXME: Remove this #if
     // Hidden but found through the visible symlink project/link.swift
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/.hidden.swift") })
-    #endif
   }
 
   func testTraversesHiddenFilesIfExplicitlySpecified() {
@@ -70,14 +62,12 @@ final class FileIteratorTests: XCTestCase {
   }
 
   func testDoesNotFollowSymlinksIfFollowSymlinksIsFalseEvenIfExplicitlySpecified() {
-    #if !os(WASI)  // FIXME: Remove this #if
     // Symlinks are not traversed even if `followSymlinks` is false even if they are explicitly
     // passed to the iterator. This is meant to avoid situations where a symlink could be hidden by
     // shell expansion; for example, if the user writes `swift-format --no-follow-symlinks *`, if
     // the current directory contains a symlink, they would probably *not* expect it to be followed.
     let seen = allFilesSeen(iteratingOver: [tmpURL("project/link.swift")], followSymlinks: false)
     XCTAssertTrue(seen.isEmpty)
-    #endif
   }
 }
 
