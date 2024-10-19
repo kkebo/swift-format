@@ -19,6 +19,7 @@ final class FileIteratorTests: XCTestCase {
     try touch("project/.build/generated.swift")
     #if !os(WASI)  // FIXME: Remove this #if
     try symlink("project/link.swift", to: "project/.hidden.swift")
+    try symlink("project/rellink.swift", relativeTo: ".hidden.swift")
     #endif
   }
 
@@ -37,14 +38,20 @@ final class FileIteratorTests: XCTestCase {
     #endif
   }
 
-  func testNoFollowSymlinks() {
+  func testNoFollowSymlinks() throws {
+    #if os(Windows) && compiler(<5.10)
+    try XCTSkipIf(true, "Foundation does not follow symlinks on Windows")
+    #endif
     let seen = allFilesSeen(iteratingOver: [tmpdir], followSymlinks: false)
     XCTAssertEqual(seen.count, 2)
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/real1.swift") })
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/real2.swift") })
   }
 
-  func testFollowSymlinks() {
+  func testFollowSymlinks() throws {
+    #if os(Windows) && compiler(<5.10)
+    try XCTSkipIf(true, "Foundation does not follow symlinks on Windows")
+    #endif
     let seen = allFilesSeen(iteratingOver: [tmpdir], followSymlinks: true)
     #if os(WASI)
     XCTAssertEqual(seen.count, 2)
@@ -59,7 +66,10 @@ final class FileIteratorTests: XCTestCase {
     #endif
   }
 
-  func testTraversesHiddenFilesIfExplicitlySpecified() {
+  func testTraversesHiddenFilesIfExplicitlySpecified() throws {
+    #if os(Windows) && compiler(<5.10)
+    try XCTSkipIf(true, "Foundation does not follow symlinks on Windows")
+    #endif
     let seen = allFilesSeen(
       iteratingOver: [tmpURL("project/.build"), tmpURL("project/.hidden.swift")],
       followSymlinks: false
@@ -75,7 +85,10 @@ final class FileIteratorTests: XCTestCase {
     // passed to the iterator. This is meant to avoid situations where a symlink could be hidden by
     // shell expansion; for example, if the user writes `swift-format --no-follow-symlinks *`, if
     // the current directory contains a symlink, they would probably *not* expect it to be followed.
-    let seen = allFilesSeen(iteratingOver: [tmpURL("project/link.swift")], followSymlinks: false)
+    let seen = allFilesSeen(
+      iteratingOver: [tmpURL("project/link.swift"), tmpURL("project/rellink.swift")],
+      followSymlinks: false
+    )
     XCTAssertTrue(seen.isEmpty)
     #endif
   }
@@ -106,11 +119,19 @@ extension FileIteratorTests {
     #endif
   }
 
-  /// Create a symlink between files or directories in the test's temporary space.
+  /// Create a absolute symlink between files or directories in the test's temporary space.
   private func symlink(_ source: String, to target: String) throws {
     try FileManager.default.createSymbolicLink(
       at: tmpURL(source),
       withDestinationURL: tmpURL(target)
+    )
+  }
+
+  /// Create a relative symlink between files or directories in the test's temporary space.
+  private func symlink(_ source: String, relativeTo target: String) throws {
+    try FileManager.default.createSymbolicLink(
+      atPath: tmpURL(source).path,
+      withDestinationPath: target
     )
   }
 

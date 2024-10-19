@@ -83,7 +83,7 @@ public struct FileIterator: Sequence, IteratorProtocol {
           else {
             break
           }
-          next = URL(fileURLWithPath: destination)
+          next = URL(fileURLWithPath: destination, relativeTo: next)
           fallthrough
 
         case .typeDirectory:
@@ -109,12 +109,12 @@ public struct FileIterator: Sequence, IteratorProtocol {
           output = next
         }
       }
-      if let out = output, visited.contains(out.absoluteURL.standardized.path) {
+      if let out = output, visited.contains(out.standardizedFileURL.path) {
         output = nil
       }
     }
     if let out = output {
-      visited.insert(out.absoluteURL.standardized.path)
+      visited.insert(out.standardizedFileURL.path)
     }
     return output
   }
@@ -147,7 +147,7 @@ public struct FileIterator: Sequence, IteratorProtocol {
         else {
           break
         }
-        path = destination
+        path = URL(fileURLWithPath: destination, relativeTo: item).path
         fallthrough
 
       case .typeRegular:
