@@ -19,8 +19,8 @@ final class FileIteratorTests: XCTestCase {
     try touch("project/.build/generated.swift")
     #if !os(WASI)  // FIXME: Remove this #if
     try symlink("project/link.swift", to: "project/.hidden.swift")
-    try symlink("project/rellink.swift", relativeTo: ".hidden.swift")
     #endif
+    try symlink("project/rellink.swift", relativeTo: ".hidden.swift")
   }
 
   override func tearDownWithError() throws {
@@ -30,6 +30,7 @@ final class FileIteratorTests: XCTestCase {
     try FileManager.default.removeItem(at: tmpURL("project/.hidden.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/generated.swift"))
     // FIXME: try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/rellink.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/"))
     try FileManager.default.removeItem(at: tmpURL("project/"))
     try FileManager.default.removeItem(at: tmpdir)
@@ -53,17 +54,11 @@ final class FileIteratorTests: XCTestCase {
     try XCTSkipIf(true, "Foundation does not follow symlinks on Windows")
     #endif
     let seen = allFilesSeen(iteratingOver: [tmpdir], followSymlinks: true)
-    #if os(WASI)
-    XCTAssertEqual(seen.count, 2)
-    #else
     XCTAssertEqual(seen.count, 3)
-    #endif
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/real1.swift") })
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/real2.swift") })
-    #if !os(WASI)  // FIXME: Remove this #if
     // Hidden but found through the visible symlink project/link.swift
     XCTAssertTrue(seen.contains { $0.hasSuffix("project/.hidden.swift") })
-    #endif
   }
 
   func testTraversesHiddenFilesIfExplicitlySpecified() throws {
@@ -80,7 +75,6 @@ final class FileIteratorTests: XCTestCase {
   }
 
   func testDoesNotFollowSymlinksIfFollowSymlinksIsFalseEvenIfExplicitlySpecified() {
-    #if !os(WASI)  // FIXME: Remove this #if
     // Symlinks are not traversed even if `followSymlinks` is false even if they are explicitly
     // passed to the iterator. This is meant to avoid situations where a symlink could be hidden by
     // shell expansion; for example, if the user writes `swift-format --no-follow-symlinks *`, if
@@ -90,7 +84,6 @@ final class FileIteratorTests: XCTestCase {
       followSymlinks: false
     )
     XCTAssertTrue(seen.isEmpty)
-    #endif
   }
 }
 
