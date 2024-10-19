@@ -44,6 +44,16 @@ extension FileManager {
       self.errorHandler = errorHandler
       super.init()
 
+      self.appendDirectoryPointer(of: url)
+    }
+
+    deinit {
+      while let (_, dp) = dpStack.popLast() {
+        closedir(dp)
+      }
+    }
+
+    private func appendDirectoryPointer(of url: URL) {
       let fm = FileManager.default
       do {
         guard fm.fileExists(atPath: url.path) else { throw _NSErrorWithErrno(ENOENT, reading: true, url: url) }
@@ -54,17 +64,6 @@ extension FileManager {
       } catch {
         rootError = error
       }
-    }
-
-    deinit {
-      while let (_, dp) = dpStack.popLast() {
-        closedir(dp)
-      }
-    }
-
-    private func appendDirectoryPointer(of url: URL) {
-      guard let dp = url.withUnsafeFileSystemRepresentation(opendir) else { return }
-      dpStack.append((url, dp))
     }
 
     override func nextObject() -> Any? {
