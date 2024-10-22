@@ -15,7 +15,8 @@ You can download `swift-format.wasm` from the following pages.
 
 The checked items are currently supported. The others are planned to be supported, but currently are not.
 
-- [x] [a-Shell (`wasm` and `wasm3`)](https://github.com/holzschu/a-shell?tab=readme-ov-file) (iOS, iPadOS)
+- [x] [a-Shell (`wasm` and `wasm3`)](https://github.com/holzschu/a-shell) (iOS, iPadOS)
+  - `wasm3` has an issue: holzschu/a-shell#836
 - [x] [Wasmtime](https://wasmtime.dev)
 - [x] [Wasmer](https://wasmer.io)
 - [x] [WasmKit](https://github.com/swiftwasm/WasmKit)
