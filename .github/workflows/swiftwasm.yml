@@ -41,7 +41,7 @@ jobs:
         run: apt-get update && apt-get install --no-install-recommends -y xz-utils
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
-          version: "25.0.2"
+          version: "26.0.0"
       - run: swift --version
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
