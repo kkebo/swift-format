@@ -1,0 +1,100 @@
+version: "1"
+rules:
+  - base: main
+    upstream: swiftlang:main
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-test
+    upstream: main
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/5.8
+    upstream: swiftlang:release/5.8
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/5.8
+    upstream: release/5.8
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/5.9
+    upstream: swiftlang:release/5.9
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/5.9
+    upstream: release/5.9
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/5.10
+    upstream: swiftlang:release/5.10
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/5.10
+    upstream: release/5.10
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.0.0
+    upstream: swiftlang:release/6.0.0
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.0.0
+    upstream: release/6.0.0
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.0.2
+    upstream: swiftlang:release/6.0.2
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.0.2
+    upstream: release/6.0.2
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.0
+    upstream: swiftlang:release/6.0
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.0
+    upstream: release/6.0
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
