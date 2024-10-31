@@ -7,7 +7,7 @@ rules:
       - kkebo
     reviewers:
       - kkebo
-  - base: wasm32-wasi-test
+  - base: wasm32-wasi
     upstream: main
     mergeMethod: merge
     assignees:
