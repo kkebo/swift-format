@@ -11,7 +11,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: swift:6.0.2-noble
+    container: swift:6.0.2-jammy
     env:
       STACK_SIZE: 524288
     steps:
@@ -32,13 +32,11 @@ jobs:
           path: swift-format.wasm
   test:
     runs-on: ubuntu-latest
-    container: swift:6.0.2-noble
+    container: swift:6.0.2-jammy
     env:
       STACK_SIZE: 4194304
     steps:
       - uses: actions/checkout@v4
-      - name: Install tools
-        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: "26.0.0"
