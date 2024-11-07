@@ -8,6 +8,7 @@ env:
   SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2024-10-31-a-wasm32-unknown-wasi.artifactbundle.zip
   SWIFT_SDK_CHECKSUM: e42546397786ea6eaec2d9c07f9118a6f3428784cf3df3840a369f19700c1a69
   TARGET_TRIPLE: wasm32-unknown-wasi
+  WASMTIME_VESRION: 26.0.1
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,12 +25,27 @@ jobs:
         run: |
           swift build --product swift-format --swift-sdk $TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
           wasm-strip .build/release/swift-format.wasm
-          wasm-opt -Oz -all .build/release/swift-format.wasm -o swift-format.wasm
-      - name: Upload artifacts
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext .build/release/swift-format.wasm -o swift-format.wasm
+      - name: Upload swift-format.wasm
         uses: actions/upload-artifact@v4
         with:
           name: swift-format.wasm
           path: swift-format.wasm
+  test-binary:
+    needs: build
+    runs-on: ubuntu-latest
+    container: swiftlang/swift:nightly-main-jammy@sha256:53838abb7c3e750b6327d339e27cac5aa4ee40e6ec545346748625ec0f4fe90b
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bytecodealliance/actions/wasmtime/setup@v1
+        with:
+          version: ${{ env.WASMTIME_VERSION }}
+      - name: Download swift-format.wasm
+        uses: actions/download-artifact@v4
+        with:
+          name: swift-format.wasm
+      - run: wasmtime --dir . swift-format.wasm --version
+      - run: wasmtime --dir . swift-format.wasm lint -r .
   test:
     runs-on: ubuntu-latest
     container: swiftlang/swift:nightly-main-jammy@sha256:53838abb7c3e750b6327d339e27cac5aa4ee40e6ec545346748625ec0f4fe90b
@@ -39,7 +55,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
-          version: "26.0.1"
+          version: ${{ env.WASMTIME_VERSION }}
       - run: swift --version
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
