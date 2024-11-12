@@ -40,6 +40,7 @@ jobs:
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
+      - run: wasmtime -V
       - name: Download swift-format.wasm
         uses: actions/download-artifact@v4
         with:
