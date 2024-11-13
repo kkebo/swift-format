@@ -56,6 +56,7 @@ class FormatFrontend: Frontend {
           source: source,
           assumingFileURL: url,
           selection: fileToProcess.selection,
+          experimentalFeatures: Set(lintFormatOptions.experimentalFeatures),
           to: &buffer,
           parsingDiagnosticHandler: diagnosticHandler
         )
@@ -73,15 +74,11 @@ class FormatFrontend: Frontend {
           source: source,
           assumingFileURL: url,
           selection: fileToProcess.selection,
+          experimentalFeatures: Set(lintFormatOptions.experimentalFeatures),
           to: &stdoutStream,
           parsingDiagnosticHandler: diagnosticHandler
         )
       }
-    } catch SwiftFormatError.fileNotReadable {
-      diagnosticsEngine.emitError(
-        "Unable to format \(url.relativePath): file is not readable or does not exist."
-      )
-      return
     } catch SwiftFormatError.fileContainsInvalidSyntax {
       guard !lintFormatOptions.ignoreUnparsableFiles else {
         guard !inPlace else {
@@ -91,10 +88,10 @@ class FormatFrontend: Frontend {
         stdoutStream.write(source)
         return
       }
-      // Otherwise, relevant diagnostics about the problematic nodes have been emitted.
-      return
+      // Otherwise, relevant diagnostics about the problematic nodes have already been emitted; we
+      // don't need to print anything else.
     } catch {
-      diagnosticsEngine.emitError("Unable to format \(url.relativePath): \(error)")
+      diagnosticsEngine.emitError("Unable to format \(url.relativePath): \(error.localizedDescription).")
     }
   }
 }
