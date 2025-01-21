@@ -8,7 +8,7 @@ env:
   SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-01-06-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-01-06-a-wasm32-unknown-wasi.artifactbundle.zip
   SWIFT_SDK_CHECKSUM: d0bc0992329b5a9772e5c9ab44d5fb90aa568b1886406161ad58b9c53d76bcba
   TARGET_TRIPLE: wasm32-unknown-wasi
-  WASMTIME_VESRION: 28.0.0
+  WASMTIME_VESRION: 28.0.1
 jobs:
   build:
     runs-on: ubuntu-latest
