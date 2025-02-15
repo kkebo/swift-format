@@ -5,14 +5,14 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.1"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-SNAPSHOT-2025-01-30-a/swift-wasm-6.1-SNAPSHOT-2025-01-30-a-wasm32-unknown-wasi.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: de863ba50d8bc96851919de1fde58ac999e8954238a95e0153c3f74ab967044a
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-SNAPSHOT-2025-02-10-a/swift-wasm-6.1-SNAPSHOT-2025-02-10-a-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: f8291a233763d047b4c4a096b7e2b71b6c31d0d14f48dcd63cd2b5704a9a628f
   TARGET_TRIPLE: wasm32-unknown-wasi
   WASMTIME_VESRION: 29.0.1
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-6.1-jammy@sha256:b89cec79e738fc60c8dc948ca6aacdd03b8cc8bf1af3b0c17044ae65f3738d70
+    container: swiftlang/swift:nightly-6.1-jammy@sha256:ffcc89219d096c3959ba8318128f88bd7b207426a6afd367b1a4f36eabe33e06
     env:
       STACK_SIZE: 524288
     steps:
@@ -34,7 +34,7 @@ jobs:
   test-binary:
     needs: build
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-6.1-jammy@sha256:b89cec79e738fc60c8dc948ca6aacdd03b8cc8bf1af3b0c17044ae65f3738d70
+    container: swiftlang/swift:nightly-6.1-jammy@sha256:ffcc89219d096c3959ba8318128f88bd7b207426a6afd367b1a4f36eabe33e06
     steps:
       - uses: actions/checkout@v4
       - uses: bytecodealliance/actions/wasmtime/setup@v1
@@ -49,7 +49,7 @@ jobs:
       - run: wasmtime --dir . swift-format.wasm lint -r .
   test:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-6.1-jammy@sha256:b89cec79e738fc60c8dc948ca6aacdd03b8cc8bf1af3b0c17044ae65f3738d70
+    container: swiftlang/swift:nightly-6.1-jammy@sha256:ffcc89219d096c3959ba8318128f88bd7b207426a6afd367b1a4f36eabe33e06
     env:
       STACK_SIZE: 4194304
     steps:
@@ -61,4 +61,4 @@ jobs:
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
       - run: swift build -c release --build-tests --swift-sdk $TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
-      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.wasm
+      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.xctest
