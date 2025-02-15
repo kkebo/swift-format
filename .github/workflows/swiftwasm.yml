@@ -61,4 +61,4 @@ jobs:
       - run: wasmtime -V
       - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
       - run: swift build -c release --build-tests --swift-sdk $TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
-      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.wasm
+      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.xctest
