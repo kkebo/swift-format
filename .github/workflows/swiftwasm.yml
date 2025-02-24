@@ -5,14 +5,14 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-02-07-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-02-07-a-wasm32-unknown-wasi.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: eda1aadeb65933181b7755bf8a85a4a0b13273443ef8617c8b7176d5a18e5a4c
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-02-18-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-02-18-a-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: e9d93d77db491c55fa86909a0530d95f069c9eef5bf999617c27b9d065414314
   TARGET_TRIPLE: wasm32-unknown-wasi
   WASMTIME_VESRION: 30.0.0
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:6c51bdf1cdaae8194ce5d651e28bb4e1ed46506d2f729c9e6cba4ffc8d8c1bdc
+    container: swiftlang/swift:nightly-main-jammy@sha256:ff675b06b5e6b96a0ee3b433cbd0e8a54591d11f928ca15c4a5bb39fda978dc1
     env:
       STACK_SIZE: 524288
     steps:
@@ -34,7 +34,7 @@ jobs:
   test-binary:
     needs: build
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:6c51bdf1cdaae8194ce5d651e28bb4e1ed46506d2f729c9e6cba4ffc8d8c1bdc
+    container: swiftlang/swift:nightly-main-jammy@sha256:ff675b06b5e6b96a0ee3b433cbd0e8a54591d11f928ca15c4a5bb39fda978dc1
     steps:
       - uses: actions/checkout@v4
       - uses: bytecodealliance/actions/wasmtime/setup@v1
@@ -49,7 +49,7 @@ jobs:
       - run: wasmtime --dir . swift-format.wasm lint -r .
   test:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:6c51bdf1cdaae8194ce5d651e28bb4e1ed46506d2f729c9e6cba4ffc8d8c1bdc
+    container: swiftlang/swift:nightly-main-jammy@sha256:ff675b06b5e6b96a0ee3b433cbd0e8a54591d11f928ca15c4a5bb39fda978dc1
     env:
       STACK_SIZE: 4194304
     steps:
