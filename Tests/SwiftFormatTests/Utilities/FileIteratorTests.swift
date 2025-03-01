@@ -50,7 +50,11 @@ final class FileIteratorTests: XCTestCase {
     #if !(os(Windows) && compiler(<5.10))
     // Test both a self-cycle and a cycle between multiple symlinks.
     try symlink("project/cycliclink.swift", relativeTo: "cycliclink.swift")
+    #if !os(WASI)
     try symlink("project/linktolink.swift", relativeTo: "link.swift")
+    #else
+    try symlink("project/linktolink.swift", relativeTo: "rellink.swift")
+    #endif
 
     // Test symlinks that use nonstandardized paths.
     try symlink("project/2stepcyclebegin.swift", relativeTo: "../project/2stepcycleend.swift")
@@ -66,6 +70,10 @@ final class FileIteratorTests: XCTestCase {
     try FileManager.default.removeItem(at: tmpURL("project/.build/generated.swift"))
     // FIXME: try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/rellink.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/cycliclink.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/linktolink.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/2stepcyclebegin.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/2stepcycleend.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/"))
     try FileManager.default.removeItem(at: tmpURL("project/"))
     try FileManager.default.removeItem(at: tmpdir)
@@ -117,6 +125,7 @@ final class FileIteratorTests: XCTestCase {
         tmpURL("project/cycliclink.swift"),
         tmpURL("project/2stepcyclebegin.swift"),
         tmpURL("project/link.swift"),
+        tmpURL("project/rellink.swift"),
       ],
       followSymlinks: true
     )
