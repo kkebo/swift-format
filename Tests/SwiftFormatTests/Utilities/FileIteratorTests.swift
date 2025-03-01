@@ -46,6 +46,20 @@ final class FileIteratorTests: XCTestCase {
     try symlink("project/link.swift", to: "project/.hidden.swift")
     #endif
     try symlink("project/rellink.swift", relativeTo: ".hidden.swift")
+
+    #if !(os(Windows) && compiler(<5.10))
+    // Test both a self-cycle and a cycle between multiple symlinks.
+    try symlink("project/cycliclink.swift", relativeTo: "cycliclink.swift")
+    #if !os(WASI)
+    try symlink("project/linktolink.swift", relativeTo: "link.swift")
+    #else
+    try symlink("project/linktolink.swift", relativeTo: "rellink.swift")
+    #endif
+
+    // Test symlinks that use nonstandardized paths.
+    try symlink("project/2stepcyclebegin.swift", relativeTo: "../project/2stepcycleend.swift")
+    try symlink("project/2stepcycleend.swift", relativeTo: "./2stepcyclebegin.swift")
+    #endif
   }
 
   override func tearDownWithError() throws {
@@ -56,6 +70,10 @@ final class FileIteratorTests: XCTestCase {
     try FileManager.default.removeItem(at: tmpURL("project/.build/generated.swift"))
     // FIXME: try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/rellink.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/cycliclink.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/linktolink.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/2stepcyclebegin.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/2stepcycleend.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/"))
     try FileManager.default.removeItem(at: tmpURL("project/"))
     try FileManager.default.removeItem(at: tmpdir)
@@ -84,6 +102,37 @@ final class FileIteratorTests: XCTestCase {
     XCTAssertTrue(seen.contains { $0.path.hasSuffix("project/real2.swift") })
     // Hidden but found through the visible symlink project/link.swift
     XCTAssertTrue(seen.contains { $0.path.hasSuffix("project/.hidden.swift") })
+  }
+
+  func testFollowSymlinksToSymlinks() throws {
+    #if os(Windows) && compiler(<5.10)
+    try XCTSkipIf(true, "Foundation does not follow symlinks on Windows")
+    #endif
+    let seen = allFilesSeen(
+      iteratingOver: [tmpURL("project/linktolink.swift")],
+      followSymlinks: true
+    )
+    // Hidden but found through the visible symlink chain.
+    XCTAssertTrue(seen.contains { $0.path.hasSuffix("project/.hidden.swift") })
+  }
+
+  func testSymlinkCyclesAreIgnored() throws {
+    #if os(Windows) && compiler(<5.10)
+    try XCTSkipIf(true, "Foundation does not follow symlinks on Windows")
+    #endif
+    let seen = allFilesSeen(
+      iteratingOver: [
+        tmpURL("project/cycliclink.swift"),
+        tmpURL("project/2stepcyclebegin.swift"),
+        tmpURL("project/link.swift"),
+        tmpURL("project/rellink.swift"),
+      ],
+      followSymlinks: true
+    )
+    // Hidden but found through the visible symlink chain.
+    XCTAssertTrue(seen.contains { $0.path.hasSuffix("project/.hidden.swift") })
+    // And the cycles were ignored.
+    XCTAssertEqual(seen.count, 1)
   }
 
   func testTraversesHiddenFilesIfExplicitlySpecified() throws {
