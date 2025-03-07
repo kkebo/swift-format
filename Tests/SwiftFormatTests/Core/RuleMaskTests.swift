@@ -1,3 +1,15 @@
+//===----------------------------------------------------------------------===//
+//
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2025 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See https://swift.org/LICENSE.txt for license information
+// See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+
 @_spi(Testing) import SwiftFormat
 import SwiftParser
 import SwiftSyntax
@@ -228,6 +240,177 @@ final class RuleMaskTests: XCTestCase {
     let lineCount = text.split(separator: "\n").count
     for i in 0..<lineCount {
       XCTAssertEqual(mask.ruleState("rule1", at: location(ofLine: i)), .default)
+    }
+  }
+
+  func testSingleRuleWholeFileIgnore() {
+    let text =
+      """
+      // This file has important contents.
+      // swift-format-ignore-file: rule1
+      // Everything in this file is ignored.
+
+      let a = 5
+      let b = 4
+
+      class Foo {
+        let member1 = 0
+        func foo() {
+          baz()
+        }
+      }
+
+      struct Baz {
+      }
+      """
+
+    let mask = createMask(sourceText: text)
+
+    let lineCount = text.split(separator: "\n").count
+    for i in 0..<lineCount {
+      XCTAssertEqual(mask.ruleState("rule1", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule2", at: location(ofLine: i)), .default)
+    }
+  }
+
+  func testMultipleRulesWholeFileIgnore() {
+    let text =
+      """
+      // This file has important contents.
+      // swift-format-ignore-file: rule1, rule2, rule3
+      // Everything in this file is ignored.
+
+      let a = 5
+      let b = 4
+
+      class Foo {
+        let member1 = 0
+        func foo() {
+          baz()
+        }
+      }
+
+      struct Baz {
+      }
+      """
+
+    let mask = createMask(sourceText: text)
+
+    let lineCount = text.split(separator: "\n").count
+    for i in 0..<lineCount {
+      XCTAssertEqual(mask.ruleState("rule1", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule2", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule3", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule4", at: location(ofLine: i)), .default)
+    }
+  }
+
+  func testFileAndLineIgnoresMixed() {
+    let text =
+      """
+      // This file has important contents.
+      // swift-format-ignore-file: rule1, rule2
+      // Everything in this file is ignored.
+
+      let a = 5
+      // swift-format-ignore: rule3
+      let b = 4
+
+      class Foo {
+        // swift-format-ignore: rule3, rule4
+        let member1 = 0
+
+        func foo() {
+          baz()
+        }
+      }
+
+      struct Baz {
+      }
+      """
+
+    let mask = createMask(sourceText: text)
+
+    let lineCount = text.split(separator: "\n").count
+    for i in 0..<lineCount {
+      XCTAssertEqual(mask.ruleState("rule1", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule2", at: location(ofLine: i)), .disabled)
+      if i == 7 {
+        XCTAssertEqual(mask.ruleState("rule3", at: location(ofLine: i)), .disabled)
+        XCTAssertEqual(mask.ruleState("rule4", at: location(ofLine: i)), .default)
+      } else if i == 11 {
+        XCTAssertEqual(mask.ruleState("rule3", at: location(ofLine: i, column: 3)), .disabled)
+        XCTAssertEqual(mask.ruleState("rule4", at: location(ofLine: i, column: 3)), .disabled)
+      } else {
+        XCTAssertEqual(mask.ruleState("rule3", at: location(ofLine: i)), .default)
+        XCTAssertEqual(mask.ruleState("rule4", at: location(ofLine: i)), .default)
+      }
+    }
+  }
+
+  func testMultipleSubsetFileIgnoreDirectives() {
+    let text =
+      """
+      // This file has important contents.
+      // swift-format-ignore-file: rule1
+      // swift-format-ignore-file: rule2
+      // Everything in this file is ignored.
+
+      let a = 5
+      let b = 4
+
+      class Foo {
+        let member1 = 0
+
+        func foo() {
+          baz()
+        }
+      }
+
+      struct Baz {
+      }
+      """
+
+    let mask = createMask(sourceText: text)
+
+    let lineCount = text.split(separator: "\n").count
+    for i in 0..<lineCount {
+      XCTAssertEqual(mask.ruleState("rule1", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule2", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule3", at: location(ofLine: i)), .default)
+    }
+  }
+
+  func testSubsetAndAllFileIgnoreDirectives() {
+    let text =
+      """
+      // This file has important contents.
+      // swift-format-ignore-file: rule1
+      // swift-format-ignore-file
+      // Everything in this file is ignored.
+
+      let a = 5
+      let b = 4
+
+      class Foo {
+        let member1 = 0
+
+        func foo() {
+          baz()
+        }
+      }
+
+      struct Baz {
+      }
+      """
+
+    let mask = createMask(sourceText: text)
+
+    let lineCount = text.split(separator: "\n").count
+    for i in 0..<lineCount {
+      XCTAssertEqual(mask.ruleState("rule1", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule2", at: location(ofLine: i)), .disabled)
+      XCTAssertEqual(mask.ruleState("rule3", at: location(ofLine: i)), .disabled)
     }
   }
 }
