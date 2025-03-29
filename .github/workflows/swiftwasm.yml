@@ -12,7 +12,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:a33290fe92a72f24e626d30166616a39ceb841858922386229d8c2aa48741ec1
+    container: swiftlang/swift:nightly-main-noble@sha256:2f44d88f735d73e84073ffc354f745a7f40067f97e8b7ac16f39377da5321bbf
     env:
       STACK_SIZE: 524288
     steps:
@@ -34,9 +34,11 @@ jobs:
   test-binary:
     needs: build
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:a33290fe92a72f24e626d30166616a39ceb841858922386229d8c2aa48741ec1
+    container: swiftlang/swift:nightly-main-noble@sha256:2f44d88f735d73e84073ffc354f745a7f40067f97e8b7ac16f39377da5321bbf
     steps:
       - uses: actions/checkout@v4
+      - name: Install tools
+        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
@@ -49,11 +51,13 @@ jobs:
       - run: wasmtime --dir . swift-format.wasm lint -r .
   test:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-jammy@sha256:a33290fe92a72f24e626d30166616a39ceb841858922386229d8c2aa48741ec1
+    container: swiftlang/swift:nightly-main-noble@sha256:2f44d88f735d73e84073ffc354f745a7f40067f97e8b7ac16f39377da5321bbf
     env:
       STACK_SIZE: 4194304
     steps:
       - uses: actions/checkout@v4
+      - name: Install tools
+        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
