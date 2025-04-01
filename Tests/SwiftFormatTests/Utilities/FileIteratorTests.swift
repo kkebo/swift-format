@@ -214,16 +214,12 @@ extension FileIteratorTests {
       at: fileURL.deletingLastPathComponent(),
       withIntermediateDirectories: true
     )
-    #if os(WASI)  // WASI doesn't support FileManager.createFile because it doesn't support atomic
-    try Data().write(to: fileURL)
-    #else
     struct FailedToCreateFileError: Error {
       let url: URL
     }
     if !FileManager.default.createFile(atPath: fileURL.path, contents: Data()) {
       throw FailedToCreateFileError(url: fileURL)
     }
-    #endif
   }
 
   /// Create a absolute symlink between files or directories in the test's temporary space.
