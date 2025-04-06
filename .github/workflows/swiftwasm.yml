@@ -5,14 +5,14 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.1"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-SNAPSHOT-2025-03-25-a/swift-wasm-6.1-SNAPSHOT-2025-03-25-a-wasm32-unknown-wasi.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: 91b61ac52a790d7afd4b34e3fbdc3118212165ef97d4ef604e8ae55002d07d49
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-SNAPSHOT-2025-04-05-a/swift-wasm-6.1-SNAPSHOT-2025-04-05-a-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: 3afef614350f78320a7519a30f0f81370b7e589435cfe901a163a6e089a261ed
   TARGET_TRIPLE: wasm32-unknown-wasi
   WASMTIME_VESRION: 31.0.0
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-6.1-noble@sha256:0829055424b072c795dc97ca3ae9768c8895147f5312f3d147aaf939f02b2645
+    container: swift:6.1.0-noble
     env:
       STACK_SIZE: 524288
     steps:
@@ -34,7 +34,7 @@ jobs:
   test-binary:
     needs: build
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-6.1-noble@sha256:0829055424b072c795dc97ca3ae9768c8895147f5312f3d147aaf939f02b2645
+    container: swift:6.1.0-noble
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
@@ -51,7 +51,7 @@ jobs:
       - run: wasmtime --dir . swift-format.wasm lint -r .
   test:
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-6.1-noble@sha256:0829055424b072c795dc97ca3ae9768c8895147f5312f3d147aaf939f02b2645
+    container: swift:6.1.0-noble
     env:
       STACK_SIZE: 4194304
     steps:
