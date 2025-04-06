@@ -5,8 +5,8 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.1"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-SNAPSHOT-2025-04-05-a/swift-wasm-6.1-SNAPSHOT-2025-04-05-a-wasm32-unknown-wasi.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: 3afef614350f78320a7519a30f0f81370b7e589435cfe901a163a6e089a261ed
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-RELEASE/swift-wasm-6.1-RELEASE-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: 7550b4c77a55f4b637c376f5d192f297fe185607003a6212ad608276928db992
   TARGET_TRIPLE: wasm32-unknown-wasi
   WASMTIME_VESRION: 31.0.0
 jobs:
