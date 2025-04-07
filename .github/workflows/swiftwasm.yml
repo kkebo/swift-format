@@ -13,24 +13,24 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: c2ab6d3360591d14af05e2bcfcc1ba970f2c3c6862e70b47f36075f846921287
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a-wasm32-unknown-wasi.artifactbundle.zip
+              checksum: 44c06fb80f9ec9f489982a118c5c8977fa73909479ae3725cf09c09a9506b326
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
           - triple: wasm32-unknown-wasip1-threads
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: 020c7a34a9b5da144f2edbe0b4d4116729ddf6a484674e11357b3fc45b226e86
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
+              checksum: 1bc46ee00a9e0c23feaba085533b83903a5fe3991596689928efd9df1de757ea
             artifact-name: swift-format-threads.wasm
             other-wasmopt-flags: --enable-threads
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
+    container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     env:
       STACK_SIZE: 524288
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
-        run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen
+        run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen unzip
       - run: swift --version
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
       - name: Build
@@ -53,7 +53,7 @@ jobs:
           - artifact-name: swift-format-threads.wasm
             other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
+    container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
@@ -74,22 +74,22 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: c2ab6d3360591d14af05e2bcfcc1ba970f2c3c6862e70b47f36075f846921287
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a-wasm32-unknown-wasi.artifactbundle.zip
+              checksum: 44c06fb80f9ec9f489982a118c5c8977fa73909479ae3725cf09c09a9506b326
             other-wasmtime-flags:
           - triple: wasm32-unknown-wasip1-threads
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: 020c7a34a9b5da144f2edbe0b4d4116729ddf6a484674e11357b3fc45b226e86
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
+              checksum: 1bc46ee00a9e0c23feaba085533b83903a5fe3991596689928efd9df1de757ea
             other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-latest
-    container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
+    container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     env:
       STACK_SIZE: 4194304
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
-        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
+        run: apt-get update && apt-get install --no-install-recommends -y xz-utils unzip
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
