@@ -72,8 +72,24 @@ jobs:
         with:
           name: swift-format.wasm
       - run: wasmtime --dir . swift-format.wasm --version
-      - run: wasmtime --dir . --wasi threads swift-format-threads.wasm --version
       - run: wasmtime --dir . swift-format.wasm lint -r .
+  test-binary-threads:
+    needs: build-threads
+    runs-on: ubuntu-latest
+    container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
+      - uses: bytecodealliance/actions/wasmtime/setup@v1
+        with:
+          version: ${{ env.WASMTIME_VERSION }}
+      - run: wasmtime -V
+      - name: Download swift-format-threads.wasm
+        uses: actions/download-artifact@v4
+        with:
+          name: swift-format-threads.wasm
+      - run: wasmtime --dir . --wasi threads swift-format-threads.wasm --version
       - run: wasmtime --dir . --wasi threads swift-format-threads.wasm lint -r .
   test:
     runs-on: ubuntu-latest
