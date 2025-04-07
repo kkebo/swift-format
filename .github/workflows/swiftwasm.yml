@@ -78,6 +78,23 @@ jobs:
           version: ${{ env.WASMTIME_VERSION }}
       - run: swift --version
       - run: wasmtime -V
+      - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
+      - run: swift build -c release --build-tests --swift-sdk $TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE .build/release/swift-formatPackageTests.xctest
+  test-threads:
+    runs-on: ubuntu-latest
+    container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
+    env:
+      STACK_SIZE: 4194304
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
+      - uses: bytecodealliance/actions/wasmtime/setup@v1
+        with:
+          version: ${{ env.WASMTIME_VERSION }}
+      - run: swift --version
+      - run: wasmtime -V
       - run: swift sdk install $THREADS_SWIFT_SDK_URL --checksum $THREADS_SWIFT_SDK_CHECKSUM
       - run: swift build -c release --build-tests --swift-sdk $THREADS_TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
       - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE --wasi threads .build/release/swift-formatPackageTests.xctest
