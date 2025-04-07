@@ -23,27 +23,38 @@ jobs:
       - name: Install tools
         run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen
       - run: swift --version
-      - name: Install Swift SDKs
-        run: |
-          swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
-          swift sdk install $THREADS_SWIFT_SDK_URL --checksum $THREADS_SWIFT_SDK_CHECKSUM
+      - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
       - name: Build
         run: |
-          # no threads version
           swift build --product swift-format --swift-sdk $TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext .build/release/swift-format.wasm -o swift-format.wasm
-          # threads version
+      - name: Upload swift-format.wasm
+        uses: actions/upload-artifact@v4
+        with:
+          name: swift-format.wasm
+          path: swift-format.wasm
+  build-threads:
+    runs-on: ubuntu-latest
+    container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
+    env:
+      STACK_SIZE: 524288
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen
+      - run: swift --version
+      - run: swift sdk install $THREADS_SWIFT_SDK_URL --checksum $THREADS_SWIFT_SDK_CHECKSUM
+      - name: Build
+        run: |
           swift build --product swift-format --swift-sdk $THREADS_TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-threads .build/release/swift-format.wasm -o swift-format-threads.wasm
       - name: Upload swift-format.wasm
         uses: actions/upload-artifact@v4
         with:
-          name: swift-format.wasm
-          path: |
-            swift-format.wasm
-            swift-format-threads.wasm
+          name: swift-format-threads.wasm
+          path: swift-format-threads.wasm
   test-binary:
     needs: build
     runs-on: ubuntu-latest
