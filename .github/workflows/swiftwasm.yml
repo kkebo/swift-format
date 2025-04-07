@@ -5,9 +5,12 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-  SWIFT_SDK_CHECKSUM: 020c7a34a9b5da144f2edbe0b4d4116729ddf6a484674e11357b3fc45b226e86
-  TARGET_TRIPLE: wasm32-unknown-wasip1-threads
+  SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasi.artifactbundle.zip
+  SWIFT_SDK_CHECKSUM: c2ab6d3360591d14af05e2bcfcc1ba970f2c3c6862e70b47f36075f846921287
+  TARGET_TRIPLE: wasm32-unknown-wasi
+  THREADS_SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-03-28-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
+  THREADS_SWIFT_SDK_CHECKSUM: 020c7a34a9b5da144f2edbe0b4d4116729ddf6a484674e11357b3fc45b226e86
+  THREADS_TARGET_TRIPLE: wasm32-unknown-wasip1-threads
   WASMTIME_VESRION: 31.0.0
 jobs:
   build:
@@ -20,17 +23,27 @@ jobs:
       - name: Install tools
         run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen
       - run: swift --version
-      - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
+      - name: Install Swift SDKs
+        run: |
+          swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
+          swift sdk install $THREADS_SWIFT_SDK_URL --checksum $THRAEDS_SWIFT_SDK_CHECKSUM
       - name: Build
         run: |
+          # no threads version
           swift build --product swift-format --swift-sdk $TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
           wasm-strip .build/release/swift-format.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-threads .build/release/swift-format.wasm -o swift-format.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext .build/release/swift-format.wasm -o swift-format.wasm
+          # threads version
+          swift build --product swift-format --swift-sdk $THRAEDS_TARGET_TRIPLE -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+          wasm-strip .build/release/swift-format.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-threads .build/release/swift-format.wasm -o swift-format-threads.wasm
       - name: Upload swift-format.wasm
         uses: actions/upload-artifact@v4
         with:
           name: swift-format.wasm
-          path: swift-format.wasm
+          path: |
+            swift-format.wasm
+            swift-format-threads.wasm
   test-binary:
     needs: build
     runs-on: ubuntu-latest
@@ -47,8 +60,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: swift-format.wasm
-      - run: wasmtime --dir . --wasi threads swift-format.wasm --version
-      - run: wasmtime --dir . --wasi threads swift-format.wasm lint -r .
+      - run: wasmtime --dir . swift-format.wasm --version
+      - run: wasmtime --dir . --wasi threads swift-format-threads.wasm --version
+      - run: wasmtime --dir . swift-format.wasm lint -r .
+      - run: wasmtime --dir . --wasi threads swift-format-threads.wasm lint -r .
   test:
     runs-on: ubuntu-latest
     container: swiftlang/swift:nightly-main-noble@sha256:a4891526a7517930bf4944c574e704068fe2f983e407f21317e986eedf565a81
@@ -63,6 +78,6 @@ jobs:
           version: ${{ env.WASMTIME_VERSION }}
       - run: swift --version
       - run: wasmtime -V
-      - run: swift sdk install $SWIFT_SDK_URL --checksum $SWIFT_SDK_CHECKSUM
-      - run: swift build -c release --build-tests --swift-sdk $TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+      - run: swift sdk install $THRAEDS_SWIFT_SDK_URL --checksum $THRAEDS_SWIFT_SDK_CHECKSUM
+      - run: swift build -c release --build-tests --swift-sdk $THREADS_TARGET_TRIPLE -Xlinker -z -Xlinker stack-size=$STACK_SIZE
       - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE --wasi threads .build/release/swift-formatPackageTests.xctest
