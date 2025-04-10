@@ -1,9 +1,9 @@
 name: SwiftWasm
 on:
   push:
-    branches: ["wasm32-wasi-release/6.1"]
+    branches: ["wasm32-wasi-release/6.1.1"]
   pull_request:
-    branches: ["wasm32-wasi-release/6.1"]
+    branches: ["wasm32-wasi-release/6.1.1"]
 env:
   SWIFT_SDK_URL: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-RELEASE/swift-wasm-6.1-RELEASE-wasm32-unknown-wasi.artifactbundle.zip
   SWIFT_SDK_CHECKSUM: 7550b4c77a55f4b637c376f5d192f297fe185607003a6212ad608276928db992
