@@ -202,7 +202,7 @@ var dependencies: [Package.Dependency] {
     return [
       .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.2"),
       .package(url: "https://github.com/kkebo/swift-markdown.git", branch: "swift-markdown-wasm32-wasi-0.6"),
-      .package(url: "https://github.com/swiftlang/swift-syntax.git", branch: "main"),
+      .package(url: "https://github.com/swiftlang/swift-syntax.git", branch: "release/6.2"),
     ]
   }
 }
