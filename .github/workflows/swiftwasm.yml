@@ -23,7 +23,7 @@ jobs:
               checksum: 1bc46ee00a9e0c23feaba085533b83903a5fe3991596689928efd9df1de757ea
             artifact-name: swift-format-threads.wasm
             other-wasmopt-flags: --enable-threads
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     env:
       STACK_SIZE: 524288
@@ -52,7 +52,7 @@ jobs:
             other-wasmtime-flags:
           - artifact-name: swift-format-threads.wasm
             other-wasmtime-flags: --wasi threads
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +82,7 @@ jobs:
               url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-03-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
               checksum: 1bc46ee00a9e0c23feaba085533b83903a5fe3991596689928efd9df1de757ea
             other-wasmtime-flags: --wasi threads
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     env:
       STACK_SIZE: 4194304
