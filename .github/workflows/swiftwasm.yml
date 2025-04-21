@@ -23,7 +23,7 @@ jobs:
               checksum: 0dd273be28741f8e1eb00682c39bdc956361ed24b5572e183dd8a4e9d1c5f6ec
             artifact-name: swift-format-threads.wasm
             other-wasmopt-flags: --enable-threads
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     container: swift:6.1.0-noble
     env:
       STACK_SIZE: 524288
@@ -52,7 +52,7 @@ jobs:
             other-wasmtime-flags:
           - artifact-name: swift-format-threads.wasm
             other-wasmtime-flags: --wasi threads
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     container: swift:6.1.0-noble
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +82,7 @@ jobs:
               url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.1-RELEASE/swift-wasm-6.1-RELEASE-wasm32-unknown-wasip1-threads.artifactbundle.zip
               checksum: 0dd273be28741f8e1eb00682c39bdc956361ed24b5572e183dd8a4e9d1c5f6ec
             other-wasmtime-flags: --wasi threads
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     container: swift:6.1.0-noble
     env:
       STACK_SIZE: 4194304
