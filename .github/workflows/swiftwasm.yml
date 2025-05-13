@@ -13,18 +13,18 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: 4b8f1e8346003cf2c3dd5b545a24c54a80d8492a7c719a50500f6056a99cc9d4
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a-wasm32-unknown-wasi.artifactbundle.zip
+              checksum: 868a2ceb8d0f17fa59396b80382d2dd2381d7a94dee1ede266f74fa4f788b4f7
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
           - triple: wasm32-unknown-wasip1-threads
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: 9f756a771ba9433e6f78e476b1c8cb2b55abce0d0d1d755d8be57f0685f4dae2
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
+              checksum: 1a14f551650cee1b23e5620ad7861ede7a3eb48b2d175ddd571ab29d32dfa7a5
             artifact-name: swift-format-threads.wasm
             other-wasmopt-flags: --enable-threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:d9a25c3c670dfb1209c969e236b4e48580a04ca63a920a92f3ac03580a33b9e1
+    container: swiftlang/swift:nightly-main-noble@sha256:a09a351b780b08ca7425a65366151c37df00f32e6b4465c8cdfbb1a7af1b9860
     env:
       STACK_SIZE: 524288
     steps:
@@ -53,7 +53,7 @@ jobs:
           - artifact-name: swift-format-threads.wasm
             other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:d9a25c3c670dfb1209c969e236b4e48580a04ca63a920a92f3ac03580a33b9e1
+    container: swiftlang/swift:nightly-main-noble@sha256:a09a351b780b08ca7425a65366151c37df00f32e6b4465c8cdfbb1a7af1b9860
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
@@ -74,16 +74,16 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: 4b8f1e8346003cf2c3dd5b545a24c54a80d8492a7c719a50500f6056a99cc9d4
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a-wasm32-unknown-wasi.artifactbundle.zip
+              checksum: 868a2ceb8d0f17fa59396b80382d2dd2381d7a94dee1ede266f74fa4f788b4f7
             other-wasmtime-flags:
           - triple: wasm32-unknown-wasip1-threads
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-04-12-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: 9f756a771ba9433e6f78e476b1c8cb2b55abce0d0d1d755d8be57f0685f4dae2
+              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-05-11-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
+              checksum: 1a14f551650cee1b23e5620ad7861ede7a3eb48b2d175ddd571ab29d32dfa7a5
             other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:d9a25c3c670dfb1209c969e236b4e48580a04ca63a920a92f3ac03580a33b9e1
+    container: swiftlang/swift:nightly-main-noble@sha256:a09a351b780b08ca7425a65366151c37df00f32e6b4465c8cdfbb1a7af1b9860
     env:
       STACK_SIZE: 4194304
     steps:
