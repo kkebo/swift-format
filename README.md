@@ -11,6 +11,12 @@ You can download `swift-format.wasm` (wasm32-unknown-wasi) and `swift-format-thr
 - main
   - [CI job artifacts](https://github.com/kkebo/swift-format/actions?query=branch%3Awasm32-wasi++)
 
+For [a-Shell](https://github.com/holzschu/a-shell) users, you can install `swift-format` by the following command:
+
+```shell
+pkg install swift-format
+```
+
 ## Supported runtimes
 
 The checked items are currently supported. The others are planned to be supported, but currently are not.
