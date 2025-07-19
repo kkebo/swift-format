@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.2"]
 env:
-  WASMTIME_VESRION: 34.0.1
+  WASMTIME_VESRION: 34.0.2
 jobs:
   build:
     strategy:
