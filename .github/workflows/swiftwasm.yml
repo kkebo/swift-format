@@ -14,16 +14,10 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: 249e8fc0dd6bc5e31583d6c63c778830ff0e3b9f98cff7ee6b31b2decf5f87cb
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a_wasm.artifactbundle.tar.gz
+              checksum: ba1725b82e07d308f1dd285ef4cbcdc61d766d68a395c3cc1e7c887dbcad0a40
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
-          - triple: wasm32-unknown-wasip1-threads
-            sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: 9d273f7b5e26bffa284a386833bb1675a04c7e177f67c58725fea41c1bc63f5a
-            artifact-name: swift-format-threads.wasm
-            other-wasmopt-flags: --enable-threads
     runs-on: ubuntu-24.04-arm
     env:
       STACK_SIZE: 524288
@@ -55,8 +49,6 @@ jobs:
         target:
           - artifact-name: swift-format.wasm
             other-wasmtime-flags:
-          - artifact-name: swift-format-threads.wasm
-            other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -81,14 +73,9 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: 249e8fc0dd6bc5e31583d6c63c778830ff0e3b9f98cff7ee6b31b2decf5f87cb
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a_wasm.artifactbundle.tar.gz
+              checksum: ba1725b82e07d308f1dd285ef4cbcdc61d766d68a395c3cc1e7c887dbcad0a40
             other-wasmtime-flags:
-          - triple: wasm32-unknown-wasip1-threads
-            sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-07-18-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: 9d273f7b5e26bffa284a386833bb1675a04c7e177f67c58725fea41c1bc63f5a
-            other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
     env:
       STACK_SIZE: 4194304
