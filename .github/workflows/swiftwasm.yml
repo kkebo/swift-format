@@ -13,18 +13,12 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: 37516de837411ea46e4f9e75d52bd742f6941febac49981aac0c4f20f02b8b54
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a_wasm.artifactbundle.tar.gz
+              checksum: ba1725b82e07d308f1dd285ef4cbcdc61d766d68a395c3cc1e7c887dbcad0a40
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
-          - triple: wasm32-unknown-wasip1-threads
-            sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: aeaae676e2e259a6bd84cc80ad04f881137c92e264278150fe4a2f5a151f3ae9
-            artifact-name: swift-format-threads.wasm
-            other-wasmopt-flags: --enable-threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:9312a6c5955840c04b287a71cb6ee77dad8aeed8f5feea817e088bd0ab2364b7
+    container: swiftlang/swift:nightly-main-noble@sha256:431010bdc206a7bc0c2556f9b09200a0d876f504fe4e05b357147767581cc8d8
     env:
       STACK_SIZE: 524288
     steps:
@@ -50,10 +44,8 @@ jobs:
         target:
           - artifact-name: swift-format.wasm
             other-wasmtime-flags:
-          - artifact-name: swift-format-threads.wasm
-            other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:9312a6c5955840c04b287a71cb6ee77dad8aeed8f5feea817e088bd0ab2364b7
+    container: swiftlang/swift:nightly-main-noble@sha256:431010bdc206a7bc0c2556f9b09200a0d876f504fe4e05b357147767581cc8d8
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
@@ -74,16 +66,11 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a-wasm32-unknown-wasi.artifactbundle.zip
-              checksum: 37516de837411ea46e4f9e75d52bd742f6941febac49981aac0c4f20f02b8b54
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-18-a_wasm.artifactbundle.tar.gz
+              checksum: ba1725b82e07d308f1dd285ef4cbcdc61d766d68a395c3cc1e7c887dbcad0a40
             other-wasmtime-flags:
-          - triple: wasm32-unknown-wasip1-threads
-            sdk:
-              url: https://github.com/swiftwasm/swift/releases/download/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a/swift-wasm-DEVELOPMENT-SNAPSHOT-2025-06-22-a-wasm32-unknown-wasip1-threads.artifactbundle.zip
-              checksum: aeaae676e2e259a6bd84cc80ad04f881137c92e264278150fe4a2f5a151f3ae9
-            other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:9312a6c5955840c04b287a71cb6ee77dad8aeed8f5feea817e088bd0ab2364b7
+    container: swiftlang/swift:nightly-main-noble@sha256:431010bdc206a7bc0c2556f9b09200a0d876f504fe4e05b357147767581cc8d8
     env:
       STACK_SIZE: 4194304
     steps:
