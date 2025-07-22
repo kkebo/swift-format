@@ -15,6 +15,10 @@ import Foundation
 import SwiftParser
 import SwiftSyntax
 
+#if os(WASI)
+import WASIHelpers
+#endif
+
 /// Collects information about rules in the formatter code base.
 @_spi(Internal) public final class RuleCollector {
   /// Information about a detected rule.
@@ -54,7 +58,12 @@ import SwiftSyntax
     // For each file in the Rules directory, find types that either conform to SyntaxLintRule or
     // inherit from SyntaxFormatRule.
     let fm = FileManager.default
-    guard let rulesEnumerator = fm.enumerator(atPath: url.path) else {
+    #if !os(WASI)
+    let rulesEnumerator = fm.enumerator(atPath: url.path)
+    #else
+    let rulesEnumerator = fm.enumeratorWASI(atPath: url.path)
+    #endif
+    guard let rulesEnumerator else {
       fatalError("Could not list the directory \(url.path)")
     }
 
