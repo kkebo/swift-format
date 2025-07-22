@@ -60,6 +60,10 @@ var targets: [Target] = [
       ])
   ),
   .target(
+    name: "_GenerateSwiftFormat",
+    dependencies: ["SwiftFormat"]
+  ),
+  .target(
     name: "WASIHelpers"
   ),
   .plugin(
@@ -90,9 +94,7 @@ var targets: [Target] = [
   ),
   .executableTarget(
     name: "generate-swift-format",
-    dependencies: [
-      "SwiftFormat"
-    ]
+    dependencies: ["_GenerateSwiftFormat"]
   ),
   .executableTarget(
     name: "swift-format",
@@ -117,6 +119,7 @@ var targets: [Target] = [
     dependencies: [
       "SwiftFormat",
       "_SwiftFormatTestSupport",
+      "_GenerateSwiftFormat",
       .product(name: "Markdown", package: "swift-markdown"),
     ] + swiftSyntaxDependencies(["SwiftOperators", "SwiftParser", "SwiftSyntax", "SwiftSyntaxBuilder"])
   ),
@@ -124,13 +127,14 @@ var targets: [Target] = [
 
 if buildOnlyTests {
   products = []
+  let allowedNames: Set<String> = ["_SwiftFormatTestSupport", "_GenerateSwiftFormat"]
   targets = targets.compactMap { target in
-    guard target.isTest || target.name == "_SwiftFormatTestSupport" else {
+    guard target.isTest || allowedNames.contains(target.name) else {
       return nil
     }
-    target.dependencies = target.dependencies.filter { dependency in
-      if case .byNameItem(name: "_SwiftFormatTestSupport", _) = dependency {
-        return true
+    target.dependencies = target.dependencies.filter {
+      if case .byNameItem(let name, _) = $0 {
+        return allowedNames.contains(name)
       }
       return false
     }

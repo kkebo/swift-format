@@ -15,6 +15,10 @@ import _FoundationCShims
 
 #if os(WASI)
 extension FileManager {
+  public func enumeratorWASI(atPath path: String) -> DirectoryEnumerator? {
+    NSPathDirectoryEnumerator(path: path)
+  }
+
   public func enumeratorWASI(
     at url: URL,
     includingPropertiesForKeys keys: [URLResourceKey]?,
@@ -122,6 +126,59 @@ extension FileManager {
         let _ = handler(url, error)
       }
       return nil
+    }
+  }
+
+  internal class NSPathDirectoryEnumerator: DirectoryEnumerator {
+    let baseURL: URL
+    let innerEnumerator: DirectoryEnumerator
+    internal var _currentItemPath: String?
+
+    override var fileAttributes: [FileAttributeKey: Any]? {
+      guard let currentItemPath = _currentItemPath else {
+        return nil
+      }
+      return try? FileManager.default.attributesOfItem(atPath: baseURL.appendingPathComponent(currentItemPath).path)
+    }
+
+    override var directoryAttributes: [FileAttributeKey: Any]? {
+      return try? FileManager.default.attributesOfItem(atPath: baseURL.path)
+    }
+
+    override var level: Int {
+      return innerEnumerator.level
+    }
+
+    override func skipDescendants() {
+      innerEnumerator.skipDescendants()
+    }
+
+    init?(path: String) {
+      guard path != "" else { return nil }
+      let url = URL(fileURLWithPath: path)
+      self.baseURL = url
+      guard
+        let ie = FileManager.default.enumeratorWASI(
+          at: url,
+          includingPropertiesForKeys: nil,
+          options: [],
+          errorHandler: nil
+        )
+      else {
+        return nil
+      }
+      self.innerEnumerator = ie
+    }
+
+    override func nextObject() -> Any? {
+      let o = innerEnumerator.nextObject()
+      guard let url = o as? URL else {
+        return nil
+      }
+
+      let path = url.path.replacingOccurrences(of: baseURL.path + "/", with: "")
+      _currentItemPath = path
+      return _currentItemPath
     }
   }
 }
