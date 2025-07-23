@@ -13,12 +13,12 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://download.swift.org/swift-6.2-branch/wasm-sdk/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-05-30-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-05-30-a_wasm.artifactbundle.tar.gz
-              checksum: c55777bd47790c9ee728380b4d4e145153f805432775511777ac89d07b559226
+              url: https://download.swift.org/swift-6.2-branch/wasm-sdk/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-07-21-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-07-21-a_wasm.artifactbundle.tar.gz
+              checksum: dafa3d04395eca993573cc31beb45a465df4ec8771e981c648b4e8adb18c8644
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:67efd3f092b810d27ad21d90b9ab32fbbcead75df80dfcfa73bb773c80f104ca
+    container: swiftlang/swift:nightly-main-noble@sha256:cc6ee97537f601b344dfe02071e91b0952212bba377ece463f1c2737984c06c2
     env:
       STACK_SIZE: 524288
     steps:
@@ -45,7 +45,7 @@ jobs:
           - artifact-name: swift-format.wasm
             other-wasmtime-flags:
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:67efd3f092b810d27ad21d90b9ab32fbbcead75df80dfcfa73bb773c80f104ca
+    container: swiftlang/swift:nightly-main-noble@sha256:cc6ee97537f601b344dfe02071e91b0952212bba377ece463f1c2737984c06c2
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
@@ -66,11 +66,11 @@ jobs:
         target:
           - triple: wasm32-unknown-wasi
             sdk:
-              url: https://download.swift.org/swift-6.2-branch/wasm-sdk/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-05-30-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-05-30-a_wasm.artifactbundle.tar.gz
-              checksum: c55777bd47790c9ee728380b4d4e145153f805432775511777ac89d07b559226
+              url: https://download.swift.org/swift-6.2-branch/wasm-sdk/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-07-21-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-07-21-a_wasm.artifactbundle.tar.gz
+              checksum: dafa3d04395eca993573cc31beb45a465df4ec8771e981c648b4e8adb18c8644
             other-wasmtime-flags:
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:67efd3f092b810d27ad21d90b9ab32fbbcead75df80dfcfa73bb773c80f104ca
+    container: swiftlang/swift:nightly-main-noble@sha256:cc6ee97537f601b344dfe02071e91b0952212bba377ece463f1c2737984c06c2
     env:
       STACK_SIZE: 4194304
     steps:
