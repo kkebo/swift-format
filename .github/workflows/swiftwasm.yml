@@ -5,6 +5,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.2"]
 env:
+  SWIFT_VERSION: 6.2-snapshot-2025-04-03
   WASMTIME_VESRION: 35.0.0
 jobs:
   build:
@@ -24,13 +25,17 @@ jobs:
             artifact-name: swift-format-threads.wasm
             other-wasmopt-flags: --enable-threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     env:
       STACK_SIZE: 524288
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
-        run: apt-get update && apt-get install --no-install-recommends -y wabt binaryen unzip
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y wabt binaryen
+      - run: ./Scripts/ci-install-swiftly.sh
+      - name: swiftly install
+        run: |
+          curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
+          swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - run: swift --version
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
       - name: Build
@@ -53,11 +58,13 @@ jobs:
           - artifact-name: swift-format-threads.wasm
             other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     steps:
       - uses: actions/checkout@v4
-      - name: Install tools
-        run: apt-get update && apt-get install --no-install-recommends -y xz-utils
+      - run: ./Scripts/ci-install-swiftly.sh
+      - name: swiftly install
+        run: |
+          curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
+          swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
@@ -83,13 +90,15 @@ jobs:
               checksum: 1bc46ee00a9e0c23feaba085533b83903a5fe3991596689928efd9df1de757ea
             other-wasmtime-flags: --wasi threads
     runs-on: ubuntu-24.04-arm
-    container: swiftlang/swift:nightly-main-noble@sha256:2d76e55473e8f2295137027de5aa0e0f8032bd60484f033d3e958cf588b00d4c
     env:
       STACK_SIZE: 4194304
     steps:
       - uses: actions/checkout@v4
-      - name: Install tools
-        run: apt-get update && apt-get install --no-install-recommends -y xz-utils unzip
+      - run: ./Scripts/ci-install-swiftly.sh
+      - name: swiftly install
+        run: |
+          curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
+          swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
