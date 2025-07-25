@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         target:
-          - triple: wasm32-unknown-wasi
+          - triple: wasm32-unknown-wasip1
             sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a_wasm.artifactbundle.tar.gz
               checksum: cdf60771229f08108c41f1ca1464dbff94c6d69fdaef10ffa278fca2601969e4
@@ -71,7 +71,7 @@ jobs:
     strategy:
       matrix:
         target:
-          - triple: wasm32-unknown-wasi
+          - triple: wasm32-unknown-wasip1
             sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a_wasm.artifactbundle.tar.gz
               checksum: cdf60771229f08108c41f1ca1464dbff94c6d69fdaef10ffa278fca2601969e4
