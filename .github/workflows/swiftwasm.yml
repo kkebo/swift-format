@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         target:
-          - triple: wasm32-unknown-wasip1
-            sdk:
+          - sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a_wasm.artifactbundle.tar.gz
               checksum: cdf60771229f08108c41f1ca1464dbff94c6d69fdaef10ffa278fca2601969e4
+              id: swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -34,7 +34,7 @@ jobs:
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
       - name: Build
         run: |
-          swift build --product swift-format --swift-sdk ${{ matrix.target.triple }} -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+          swift build --product swift-format --swift-sdk ${{ matrix.target.sdk.id }} -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext ${{ matrix.target.other-wasmopt-flags }} .build/release/swift-format.wasm -o ${{ matrix.target.artifact-name }}
       - name: Upload ${{ matrix.target.artifact-name }}
@@ -71,10 +71,10 @@ jobs:
     strategy:
       matrix:
         target:
-          - triple: wasm32-unknown-wasip1
-            sdk:
+          - sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a/swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a_wasm.artifactbundle.tar.gz
               checksum: cdf60771229f08108c41f1ca1464dbff94c6d69fdaef10ffa278fca2601969e4
+              id: swift-DEVELOPMENT-SNAPSHOT-2025-07-23-a_wasm
             other-wasmtime-flags:
     runs-on: ubuntu-24.04-arm
     env:
@@ -92,5 +92,5 @@ jobs:
       - run: swift --version
       - run: wasmtime -V
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
-      - run: swift build -c release --build-tests --swift-sdk ${{ matrix.target.triple }} -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+      - run: swift build -c release --build-tests --swift-sdk ${{ matrix.target.sdk.id }} -Xlinker -z -Xlinker stack-size=$STACK_SIZE
       - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE ${{ matrix.target.other-wasmtime-flags }} .build/release/swift-formatPackageTests.xctest
