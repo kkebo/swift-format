@@ -4,7 +4,7 @@ The WebAssembly (WASI) version of `swift-format`. This project's goal is to be m
 
 ## Download
 
-You can download `swift-format.wasm` (wasm32-unknown-wasi) and `swift-format-threads.wasm` (wasm32-unknown-wasip1-threads) from the following pages.
+You can download `swift-format.wasm` from the following pages.
 
 - stable
   - [Releases](https://github.com/kkebo/swift-format/releases)
