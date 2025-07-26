@@ -94,3 +94,10 @@ jobs:
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
       - run: swift build -c release --build-tests --swift-sdk ${{ matrix.target.sdk.id }} -Xlinker -z -Xlinker stack-size=$STACK_SIZE
       - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE ${{ matrix.target.other-wasmtime-flags }} .build/release/swift-formatPackageTests.xctest
+  results:
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04-arm
+    needs: [build, test-binary, test]
+    steps:
+      - run: exit 1
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
