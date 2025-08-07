@@ -48,7 +48,7 @@ jobs:
       matrix:
         target:
           - artifact-name: swift-format.wasm
-            other-wasmtime-flags:
+            other-wasmkit-flags:
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -57,16 +57,12 @@ jobs:
         run: |
           curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
           swiftly install -y --use ${{ env.SWIFT_VERSION }}
-      - uses: bytecodealliance/actions/wasmtime/setup@v1
-        with:
-          version: ${{ env.WASMTIME_VERSION }}
-      - run: wasmtime -V
       - name: Download ${{ matrix.target.artifact-name }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.target.artifact-name }}
-      - run: wasmtime --dir . ${{ matrix.target.other-wasmtime-flags }} ${{ matrix.target.artifact-name }} --version
-      - run: wasmtime --dir . ${{ matrix.target.other-wasmtime-flags }} ${{ matrix.target.artifact-name }} lint -r .
+      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} -- --version
+      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} -- lint -r .
   test:
     strategy:
       matrix:
