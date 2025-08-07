@@ -208,7 +208,10 @@ var dependencies: [Package.Dependency] {
         url: "https://github.com/apple/swift-argument-parser.git",
         revision: "d075877f3a7a06e75d46b3c3275dcba0ac9c9f9b"
       ),  // TODO: Revert this to `from: "1.2.2"` when the next version is released.
-      .package(url: "https://github.com/kkebo/swift-markdown.git", branch: "swift-markdown-wasm32-wasi-0.6"),
+      .package(
+        url: "https://github.com/swiftlang/swift-markdown.git",
+        revision: "c281baa59e2b0d3ddc72848741217af811f66d39"
+      ),  // TODO: Revert this to `from: "0.2.0"` when the next version is released.
       .package(url: "https://github.com/swiftlang/swift-syntax.git", branch: "main"),
     ]
   }
