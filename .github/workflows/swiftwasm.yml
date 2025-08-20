@@ -6,7 +6,7 @@ on:
     branches: ["wasm32-wasi-release/6.2"]
 env:
   SWIFT_VERSION: 6.2-snapshot-2025-08-19
-  WASMTIME_VESRION: 35.0.0
+  WASMTIME_VESRION: 36.0.0
 jobs:
   build:
     strategy:
