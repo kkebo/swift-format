@@ -26,10 +26,7 @@ jobs:
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y wabt binaryen
       - run: ./Scripts/ci-install-swiftly.sh
-      - name: swiftly install
-        run: |
-          curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
-          swiftly install -y --use ${{ env.SWIFT_VERSION }}
+      - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - run: swift --version
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
       - name: Build
@@ -53,10 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./Scripts/ci-install-swiftly.sh
-      - name: swiftly install
-        run: |
-          curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
-          swiftly install -y --use ${{ env.SWIFT_VERSION }}
+      - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - name: Download ${{ matrix.target.artifact-name }}
         uses: actions/download-artifact@v4
         with:
@@ -78,10 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./Scripts/ci-install-swiftly.sh
-      - name: swiftly install
-        run: |
-          curl --silent --retry 3 --location --fail --compressed https://swift.org/keys/all-keys.asc | gpg --import -
-          swiftly install -y --use ${{ env.SWIFT_VERSION }}
+      - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - uses: bytecodealliance/actions/wasmtime/setup@v1
         with:
           version: ${{ env.WASMTIME_VERSION }}
