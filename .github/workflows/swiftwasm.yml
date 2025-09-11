@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_VERSION: main-snapshot-2025-09-07
+  SWIFT_VERSION: main-snapshot-2025-09-10
   WASMTIME_VESRION: 36.0.2
 jobs:
   build:
@@ -13,9 +13,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-09-07-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-07-a_wasm.artifactbundle.tar.gz
-              checksum: 47090e870ac2297befc4d49a103c215fe7f7221eb1d4d05dc91e98688e96527d
-              id: swift-DEVELOPMENT-SNAPSHOT-2025-09-07-a_wasm
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-09-10-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-10-a_wasm.artifactbundle.tar.gz
+              checksum: 28db0e81248b4f75f3b9ca9f7367d77855f44692bdfaeb91df37075b2e04bfb6
+              id: swift-DEVELOPMENT-SNAPSHOT-2025-09-10-a_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -62,9 +62,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-09-07-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-07-a_wasm.artifactbundle.tar.gz
-              checksum: 47090e870ac2297befc4d49a103c215fe7f7221eb1d4d05dc91e98688e96527d
-              id: swift-DEVELOPMENT-SNAPSHOT-2025-09-07-a_wasm
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-09-10-a/swift-DEVELOPMENT-SNAPSHOT-2025-09-10-a_wasm.artifactbundle.tar.gz
+              checksum: 28db0e81248b4f75f3b9ca9f7367d77855f44692bdfaeb91df37075b2e04bfb6
+              id: swift-DEVELOPMENT-SNAPSHOT-2025-09-10-a_wasm
             other-wasmtime-flags:
     runs-on: ubuntu-24.04-arm
     env:
