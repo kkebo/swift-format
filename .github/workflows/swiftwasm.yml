@@ -55,8 +55,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.target.artifact-name }}
-      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} -- --version
-      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} -- lint -r .
+      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} --version
+      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} lint -r .
   test:
     strategy:
       matrix:
