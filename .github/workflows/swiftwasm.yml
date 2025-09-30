@@ -22,7 +22,7 @@ jobs:
     env:
       STACK_SIZE: 524288
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y wabt binaryen
       - run: ./Scripts/ci-install-swiftly.sh
@@ -35,7 +35,7 @@ jobs:
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext ${{ matrix.target.other-wasmopt-flags }} .build/release/swift-format.wasm -o ${{ matrix.target.artifact-name }}
       - name: Upload ${{ matrix.target.artifact-name }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: ${{ matrix.target.artifact-name }}
           path: ${{ matrix.target.artifact-name }}
@@ -48,11 +48,11 @@ jobs:
             other-wasmkit-flags:
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       - run: ./Scripts/ci-install-swiftly.sh
       - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
       - name: Download ${{ matrix.target.artifact-name }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0  # v5.0.0
         with:
           name: ${{ matrix.target.artifact-name }}
       - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} --version
@@ -70,10 +70,10 @@ jobs:
     env:
       STACK_SIZE: 4194304
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       - run: ./Scripts/ci-install-swiftly.sh
       - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
-      - uses: bytecodealliance/actions/wasmtime/setup@v1
+      - uses: bytecodealliance/actions/wasmtime/setup@3b93676295fd6f7eaa7af2c2785539e052fa8349  # v1.1.1
         with:
           version: ${{ env.WASMTIME_VERSION }}
       - run: swift --version
