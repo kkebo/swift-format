@@ -200,10 +200,7 @@ var dependencies: [Package.Dependency] {
     ]
   } else {
     return [
-      .package(
-        url: "https://github.com/apple/swift-argument-parser.git",
-        revision: "d075877f3a7a06e75d46b3c3275dcba0ac9c9f9b"
-      ),  // TODO: Revert this to `from: "1.2.2"` when the next version is released.
+      .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.2"),
       .package(
         url: "https://github.com/apple/swift-markdown.git",
         revision: "c281baa59e2b0d3ddc72848741217af811f66d39"
