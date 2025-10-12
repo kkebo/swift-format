@@ -70,10 +70,7 @@ jobs:
               url: https://download.swift.org/swift-6.2-branch/wasm-sdk/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-10-09-a/swift-6.2-DEVELOPMENT-SNAPSHOT-2025-10-09-a_wasm.artifactbundle.tar.gz
               checksum: 048667dbddd50bfb797d09d194bd0c1c53b251a121f4b870402154b0adab556e
               id: swift-6.2-DEVELOPMENT-SNAPSHOT-2025-10-09-a_wasm
-            other-wasmtime-flags:
     runs-on: ubuntu-24.04-arm
-    env:
-      STACK_SIZE: 4194304
     permissions:
       contents: read
     steps:
@@ -86,8 +83,7 @@ jobs:
       - run: swift --version
       - run: wasmtime -V
       - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
-      - run: swift build -c release --build-tests --swift-sdk ${{ matrix.target.sdk.id }} -Xlinker -z -Xlinker stack-size=$STACK_SIZE
-      - run: wasmtime --dir / --wasm max-wasm-stack=$STACK_SIZE ${{ matrix.target.other-wasmtime-flags }} .build/release/swift-formatPackageTests.xctest
+      - run: swift test -c release --swift-sdk ${{ matrix.target.sdk.id }} --toolset wasi-test-toolset.json
   results:
     if: ${{ always() }}
     runs-on: ubuntu-24.04-arm
