@@ -1,0 +1,16 @@
+{
+    "schemaVersion": "1.0",
+    "linker": {
+        "extraCLIOptions": [
+            "-z", "stack-size=419434"
+        ]
+    },
+    "testRunner": {
+        "path": "/usr/bin/env",
+        "extraCLIOptions": [
+            "wasmtime",
+            "--dir", "/",
+            "--wasm", "max-wasm-stack=419434"
+        ]
+    }
+}
