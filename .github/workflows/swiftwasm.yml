@@ -8,6 +8,9 @@ env:
   SWIFT_VERSION: 6.2.0
   WASMTIME_VESRION: 37.0.2
 permissions: {}
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
 jobs:
   build:
     strategy:
