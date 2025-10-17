@@ -9,7 +9,8 @@ env:
   WASMTIME_VERSION: 37.0.2
 permissions: {}
 defaults:
-  run: bash -euo pipefail
+  run:
+    shell: bash -euo pipefail
 jobs:
   build:
     strategy:
