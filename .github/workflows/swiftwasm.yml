@@ -10,7 +10,7 @@ env:
 permissions: {}
 defaults:
   run:
-    shell: bash -euo pipefail
+    shell: bash -euo pipefail {0}
 jobs:
   build:
     strategy:
