@@ -44,7 +44,7 @@ jobs:
           WASMOPT_FLAGS: ${{ matrix.target.other-wasmopt-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
         run: |
-          swift build --product swift-format --swift-sdk "$SDK_ID" -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+          swift build --product swift-format --swift-sdk "$SDK_ID" -c release -Xlinker -z -Xlinker stack-size="$STACK_SIZE"
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
