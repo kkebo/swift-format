@@ -6,8 +6,11 @@ on:
     branches: ["wasm32-wasi-release/6.2.1"]
 env:
   SWIFT_VERSION: 6.2.0
-  WASMTIME_VESRION: 37.0.2
+  WASMTIME_VERSION: 37.0.2
 permissions: {}
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
 jobs:
   build:
     strategy:
@@ -29,14 +32,21 @@ jobs:
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y wabt binaryen
       - run: ./Scripts/ci-install-swiftly.sh
-      - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
+      - run: swiftly install -y --use "$SWIFT_VERSION"
       - run: swift --version
-      - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
+      - env:
+          SDK_URL: ${{ matrix.target.sdk.url }}
+          SDK_CHECKSUM: ${{ matrix.target.sdk.checksum }}
+        run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
       - name: Build
+        env:
+          SDK_ID: ${{ matrix.target.sdk.id }}
+          WASMOPT_FLAGS: ${{ matrix.target.other-wasmopt-flags }}
+          ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
         run: |
-          swift build --product swift-format --swift-sdk ${{ matrix.target.sdk.id }} -c release -Xlinker -z -Xlinker stack-size=$STACK_SIZE
+          swift build --product swift-format --swift-sdk "$SDK_ID" -c release -Xlinker -z -Xlinker stack-size="$STACK_SIZE"
           wasm-strip .build/release/swift-format.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext ${{ matrix.target.other-wasmopt-flags }} .build/release/swift-format.wasm -o ${{ matrix.target.artifact-name }}
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
@@ -55,13 +65,19 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       - run: ./Scripts/ci-install-swiftly.sh
-      - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
+      - run: swiftly install -y --use "$SWIFT_VERSION"
       - name: Download ${{ matrix.target.artifact-name }}
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0  # v5.0.0
         with:
           name: ${{ matrix.target.artifact-name }}
-      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} -- --version
-      - run: wasmkit run --dir . ${{ matrix.target.other-wasmkit-flags }} ${{ matrix.target.artifact-name }} -- lint -r .
+      - env:
+          WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
+          ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" -- --version
+      - env:
+          WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
+          ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" -- lint -r .
   test:
     strategy:
       matrix:
@@ -76,14 +92,19 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       - run: ./Scripts/ci-install-swiftly.sh
-      - run: swiftly install -y --use ${{ env.SWIFT_VERSION }}
+      - run: swiftly install -y --use "$SWIFT_VERSION"
       - uses: bytecodealliance/actions/wasmtime/setup@3b93676295fd6f7eaa7af2c2785539e052fa8349  # v1.1.1
         with:
           version: ${{ env.WASMTIME_VERSION }}
       - run: swift --version
       - run: wasmtime -V
-      - run: swift sdk install ${{ matrix.target.sdk.url }} --checksum ${{ matrix.target.sdk.checksum }}
-      - run: swift test -c release --swift-sdk ${{ matrix.target.sdk.id }} --toolset wasi-test-toolset.json
+      - env:
+          SDK_URL: ${{ matrix.target.sdk.url }}
+          SDK_CHECKSUM: ${{ matrix.target.sdk.checksum }}
+        run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
+      - env:
+          SDK_ID: ${{ matrix.target.sdk.id }}
+        run: swift test -c release --swift-sdk "$SDK_ID" --toolset wasi-test-toolset.json
   results:
     if: ${{ always() }}
     runs-on: ubuntu-24.04-arm
