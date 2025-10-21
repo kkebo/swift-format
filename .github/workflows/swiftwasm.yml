@@ -6,7 +6,7 @@ on:
     branches: ["wasm32-wasi-release/6.2.1"]
 env:
   SWIFT_VERSION: 6.2.0
-  WASMTIME_VERSION: 38.0.1
+  WASMTIME_VERSION: 38.0.2
 permissions: {}
 defaults:
   run:
