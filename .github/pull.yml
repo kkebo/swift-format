@@ -98,9 +98,23 @@ rules:
       - kkebo
     reviewers:
       - kkebo
+  - base: release/6.2.0
+    upstream: swiftlang:release/6.2.0
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
   - base: wasm32-wasi-release/6.2.0
     upstream: release/6.2.0
     mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.2.1
+    upstream: swiftlang:release/6.2.1
+    mergeMethod: hardreset
     assignees:
       - kkebo
     reviewers:
