@@ -2,7 +2,7 @@
 //
 // This source file is part of the Swift.org open source project
 //
-// Copyright (c) 2014 - 2019 Apple Inc. and the Swift project authors
+// Copyright (c) 2014 - 2020 Apple Inc. and the Swift project authors
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See https://swift.org/LICENSE.txt for license information
@@ -11,14 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 import Foundation
-import _FoundationCShims
 
-#if os(WASI)
 extension FileManager {
+  /* enumeratorAtPath: returns an NSDirectoryEnumerator rooted at the provided path. If the enumerator cannot be created, this returns NULL. Because NSDirectoryEnumerator is a subclass of NSEnumerator, the returned object can be used in the for...in construct.
+   */
   public func enumeratorWASI(atPath path: String) -> DirectoryEnumerator? {
     NSPathDirectoryEnumerator(path: path)
   }
 
+  /* enumeratorAtURL:includingPropertiesForKeys:options:errorHandler: returns an NSDirectoryEnumerator rooted at the provided directory URL. The NSDirectoryEnumerator returns NSURLs from the -nextObject method. The optional 'includingPropertiesForKeys' parameter indicates which resource properties should be pre-fetched and cached with each enumerated URL. The optional 'errorHandler' block argument is invoked when an error occurs. Parameters to the block are the URL on which an error occurred and the error. When the error handler returns YES, enumeration continues if possible. Enumeration stops immediately when the error handler returns NO.
+  
+    If you wish to only receive the URLs and no other attributes, then pass '0' for 'options' and an empty NSArray ('[NSArray array]') for 'keys'. If you wish to have the property caches of the vended URLs pre-populated with a default set of attributes, then pass '0' for 'options' and 'nil' for 'keys'.
+   */
+  // Note: Because the error handler is an optional block, the compiler treats it as @escaping by default. If that behavior changes, the @escaping will need to be added back.
   public func enumeratorWASI(
     at url: URL,
     includingPropertiesForKeys keys: [URLResourceKey]?,
@@ -30,105 +35,6 @@ extension FileManager {
 }
 
 extension FileManager {
-  /// Thread-unsafe directory enumerator.
-  class NSURLDirectoryEnumerator: DirectoryEnumerator {
-    private(set) var dpStack = [(URL, OpaquePointer)]()
-    var url: URL
-    var options: FileManager.DirectoryEnumerationOptions
-    var errorHandler: ((URL, any Error) -> Bool)?
-    var rootError: (any Error)? = nil
-
-    init(
-      url: URL,
-      options: FileManager.DirectoryEnumerationOptions,
-      errorHandler: ( /* @escaping */(URL, Error) -> Bool)?
-    ) {
-      self.url = url
-      self.options = options
-      self.errorHandler = errorHandler
-      super.init()
-
-      self.appendDirectoryPointer(of: url)
-    }
-
-    deinit {
-      while let (_, dp) = dpStack.popLast() {
-        closedir(dp)
-      }
-    }
-
-    private func appendDirectoryPointer(of url: URL) {
-      let fm = FileManager.default
-      do {
-        guard fm.fileExists(atPath: url.path) else { throw _NSErrorWithErrno(ENOENT, reading: true, url: url) }
-        guard let dp = fm.withFileSystemRepresentation(for: url.path, opendir) else {
-          throw _NSErrorWithErrno(errno, reading: true, url: url)
-        }
-        dpStack.append((url, dp))
-      } catch {
-        rootError = error
-      }
-    }
-
-    override func nextObject() -> Any? {
-      func match(filename: String, to options: DirectoryEnumerationOptions, isDir: Bool) -> (Bool, Bool) {
-        var showFile = true
-        var skipDescendants = false
-
-        if isDir {
-          if options.contains(.skipsSubdirectoryDescendants) {
-            skipDescendants = true
-          }
-          // Ignore .skipsPackageDescendants
-        }
-        if options.contains(.skipsHiddenFiles) && filename.hasPrefix(".") {
-          showFile = false
-          skipDescendants = true
-        }
-
-        return (showFile, skipDescendants)
-      }
-
-      while let (url, dp) = dpStack.last {
-        while let ep = readdir(dp) {
-          guard ep.pointee.d_ino != 0 else { continue }
-          let filename = String(cString: _platform_shims_dirent_d_name(ep))
-          guard filename != "." && filename != ".." else { continue }
-          let child = url.appendingPathComponent(filename)
-          var isDirectory = false
-          if ep.pointee.d_type == _platform_shims_DT_DIR() {
-            isDirectory = true
-          } else if ep.pointee.d_type == _platform_shims_DT_UNKNOWN() {
-            var status = stat()
-            if stat(child.path, &status) == 0, (status.st_mode & S_IFMT) == S_IFDIR {
-              isDirectory = true
-            }
-          }
-          if isDirectory {
-            let (showFile, skipDescendants) = match(filename: filename, to: options, isDir: true)
-            if !skipDescendants {
-              appendDirectoryPointer(of: child)
-            }
-            if showFile {
-              return child
-            }
-          } else {
-            let (showFile, _) = match(filename: filename, to: options, isDir: false)
-            if showFile {
-              return child
-            }
-          }
-        }
-        closedir(dp)
-        dpStack.removeLast()
-      }
-      if let error = rootError, let handler = errorHandler {
-        let _ = handler(url, error)
-      }
-      return nil
-    }
-  }
-
   internal class NSPathDirectoryEnumerator: DirectoryEnumerator {
     let baseURL: URL
     let innerEnumerator: DirectoryEnumerator
@@ -171,55 +77,7 @@ extension FileManager {
     }
 
     override func nextObject() -> Any? {
-      let o = innerEnumerator.nextObject()
-      guard let url = o as? URL else {
-        return nil
-      }
-
-      let path = url.path.replacingOccurrences(of: baseURL.path + "/", with: "")
-      _currentItemPath = path
-      return _currentItemPath
+      return _nextObject()
     }
   }
 }
-
-func _NSErrorWithErrno(
-  _ posixErrno: Int32,
-  reading: Bool,
-  path: String? = nil,
-  url: URL? = nil,
-  extraUserInfo: [String: Any]? = nil
-) -> NSError {
-  var cocoaError: CocoaError.Code
-  if reading {
-    switch posixErrno {
-    case EFBIG: cocoaError = .fileReadTooLarge
-    case ENOENT: cocoaError = .fileReadNoSuchFile
-    case EPERM, EACCES: cocoaError = .fileReadNoPermission
-    case ENAMETOOLONG: cocoaError = .fileReadUnknown
-    default: cocoaError = .fileReadUnknown
-    }
-  } else {
-    switch posixErrno {
-    case ENOENT: cocoaError = .fileNoSuchFile
-    case EPERM, EACCES: cocoaError = .fileWriteNoPermission
-    case ENAMETOOLONG: cocoaError = .fileWriteInvalidFileName
-    case EDQUOT, ENOSPC: cocoaError = .fileWriteOutOfSpace
-    case EROFS: cocoaError = .fileWriteVolumeReadOnly
-    case EEXIST: cocoaError = .fileWriteFileExists
-    default: cocoaError = .fileWriteUnknown
-    }
-  }
-
-  var userInfo = extraUserInfo ?? [String: Any]()
-  if let path = path {
-    userInfo[NSFilePathErrorKey] = path
-  } else if let url = url {
-    userInfo[NSURLErrorKey] = url
-  }
-
-  userInfo[NSUnderlyingErrorKey] = NSError(domain: NSPOSIXErrorDomain, code: Int(posixErrno))
-
-  return NSError(domain: NSCocoaErrorDomain, code: cocoaError.rawValue, userInfo: userInfo)
-}
-#endif
