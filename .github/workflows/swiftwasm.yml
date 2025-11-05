@@ -46,7 +46,7 @@ jobs:
         run: |
           swift build --product swift-format --swift-sdk "$SDK_ID" -c release -Xlinker -z -Xlinker stack-size="$STACK_SIZE"
           wasm-strip .build/release/swift-format.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
