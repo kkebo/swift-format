@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_VERSION: main-snapshot-2025-10-02
+  SWIFT_VERSION: main-snapshot-2025-11-03
   WASMTIME_VERSION: 38.0.3
 permissions: {}
 defaults:
@@ -17,9 +17,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-10-02-a/swift-DEVELOPMENT-SNAPSHOT-2025-10-02-a_wasm.artifactbundle.tar.gz
-              checksum: b64dfad9e1c9ccdf06f35cf9b1a00317e000df0c0de0b3eb9f49d6db0fcba4d9
-              id: swift-DEVELOPMENT-SNAPSHOT-2025-10-02-a_wasm
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-11-03-a/swift-DEVELOPMENT-SNAPSHOT-2025-11-03-a_wasm.artifactbundle.tar.gz
+              checksum: bf2571b519075f1e60f4de0c692dbda510643382b15c9a0dba66173396cf1328
+              id: swift-DEVELOPMENT-SNAPSHOT-2025-11-03-a_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -46,7 +46,7 @@ jobs:
         run: |
           swift build --product swift-format --swift-sdk "$SDK_ID" -c release -Xlinker -z -Xlinker stack-size="$STACK_SIZE"
           wasm-strip .build/release/swift-format.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
@@ -83,9 +83,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-10-02-a/swift-DEVELOPMENT-SNAPSHOT-2025-10-02-a_wasm.artifactbundle.tar.gz
-              checksum: b64dfad9e1c9ccdf06f35cf9b1a00317e000df0c0de0b3eb9f49d6db0fcba4d9
-              id: swift-DEVELOPMENT-SNAPSHOT-2025-10-02-a_wasm
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2025-11-03-a/swift-DEVELOPMENT-SNAPSHOT-2025-11-03-a_wasm.artifactbundle.tar.gz
+              checksum: bf2571b519075f1e60f4de0c692dbda510643382b15c9a0dba66173396cf1328
+              id: swift-DEVELOPMENT-SNAPSHOT-2025-11-03-a_wasm
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
