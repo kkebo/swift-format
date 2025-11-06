@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.2.1"]
 env:
-  SWIFT_VERSION: 6.2.0
+  SWIFT_VERSION: 6.2.1
   WASMTIME_VERSION: 38.0.3
 permissions: {}
 defaults:
@@ -17,9 +17,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/swift-6.2-release/wasm/swift-6.2-RELEASE/swift-6.2-RELEASE_wasm.artifactbundle.tar.gz
-              checksum: fe4e8648309fce86ea522e9e0d1dc48e82df6ba6e5743dbf0c53db8429fb5224
-              id: swift-6.2-RELEASE_wasm
+              url: https://download.swift.org/swift-6.2.1-release/wasm-sdk/swift-6.2.1-RELEASE/swift-6.2.1-RELEASE_wasm.artifactbundle.tar.gz
+              checksum: 482b9f95462b87bedfafca94a092cf9ec4496671ca13b43745097122d20f18af
+              id: swift-6.2.1-RELEASE_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -73,19 +73,19 @@ jobs:
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" -- --version
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" --version
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" -- lint -r .
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" lint -r .
   test:
     strategy:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/swift-6.2-release/wasm/swift-6.2-RELEASE/swift-6.2-RELEASE_wasm.artifactbundle.tar.gz
-              checksum: fe4e8648309fce86ea522e9e0d1dc48e82df6ba6e5743dbf0c53db8429fb5224
-              id: swift-6.2-RELEASE_wasm
+              url: https://download.swift.org/swift-6.2.1-release/wasm-sdk/swift-6.2.1-RELEASE/swift-6.2.1-RELEASE_wasm.artifactbundle.tar.gz
+              checksum: 482b9f95462b87bedfafca94a092cf9ec4496671ca13b43745097122d20f18af
+              id: swift-6.2.1-RELEASE_wasm
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
