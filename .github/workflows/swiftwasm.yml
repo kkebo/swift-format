@@ -73,11 +73,11 @@ jobs:
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" -- --version
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" --version
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" -- lint -r .
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" lint -r .
   test:
     strategy:
       matrix:
