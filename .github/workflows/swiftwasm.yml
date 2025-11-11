@@ -1,9 +1,9 @@
 name: SwiftWasm
 on:
   push:
-    branches: ["wasm32-wasi-release/6.2"]
+    branches: ["wasm32-wasi-release/6.2.2"]
   pull_request:
-    branches: ["wasm32-wasi-release/6.2"]
+    branches: ["wasm32-wasi-release/6.2.2"]
 env:
   SWIFT_VERSION: 6.2-snapshot-2025-11-05
   WASMTIME_VERSION: 38.0.3
