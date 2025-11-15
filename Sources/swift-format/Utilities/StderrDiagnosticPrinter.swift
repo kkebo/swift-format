@@ -76,18 +76,18 @@ final class StderrDiagnosticPrinter {
   private func _printDiagnostic(_ diagnostic: Diagnostic) {
     let stderr = FileHandleTextOutputStream(FileHandle.standardError)
 
-      stderr.write("\(ansiSGR(.reset))\(description(of: diagnostic.location)): ")
+    stderr.write("\(ansiSGR(.reset))\(description(of: diagnostic.location)): ")
 
     switch diagnostic.severity {
     case .error: stderr.write("\(ansiSGR(.boldRed))error: ")
-      case .warning: stderr.write("\(ansiSGR(.boldYellow))warning: ")
+    case .warning: stderr.write("\(ansiSGR(.boldYellow))warning: ")
     case .note: stderr.write("\(ansiSGR(.boldGray))note: ")
     }
 
     if let category = diagnostic.category {
-        stderr.write("\(ansiSGR(.boldMagenta))[\(category)] ")
+      stderr.write("\(ansiSGR(.boldMagenta))[\(category)] ")
     }
-      stderr.write("\(ansiSGR(.reset))\(ansiSGR(.bold))\(diagnostic.message)\(ansiSGR(.reset))\n")
+    stderr.write("\(ansiSGR(.reset))\(ansiSGR(.bold))\(diagnostic.message)\(ansiSGR(.reset))\n")
   }
 
   /// Returns a string representation of the given diagnostic location, or a fallback string if the
