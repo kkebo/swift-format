@@ -54,19 +54,13 @@ final class FileIteratorTests: XCTestCase {
     try touch("project/real2.swift")
     try touch("project/.hidden.swift")
     try touch("project/.build/generated.swift")
-    #if !os(WASI)  // FIXME: Remove this #if
     try symlink("project/link.swift", to: "project/.hidden.swift")
-    #endif
     try symlink("project/rellink.swift", relativeTo: ".hidden.swift")
 
     #if !(os(Windows) && compiler(<5.10))
     // Test both a self-cycle and a cycle between multiple symlinks.
     try symlink("project/cycliclink.swift", relativeTo: "cycliclink.swift")
-    #if !os(WASI)
     try symlink("project/linktolink.swift", relativeTo: "link.swift")
-    #else
-    try symlink("project/linktolink.swift", relativeTo: "rellink.swift")
-    #endif
 
     // Test symlinks that use nonstandardized paths.
     try symlink("project/2stepcyclebegin.swift", relativeTo: "../project/2stepcycleend.swift")
@@ -80,7 +74,7 @@ final class FileIteratorTests: XCTestCase {
     try FileManager.default.removeItem(at: tmpURL("project/real2.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.hidden.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/.build/generated.swift"))
-    // FIXME: try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
+    try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/rellink.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/cycliclink.swift"))
     try FileManager.default.removeItem(at: tmpURL("project/linktolink.swift"))
