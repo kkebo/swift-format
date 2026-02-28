@@ -68,6 +68,7 @@ final class StderrDiagnosticPrinter {
       _printDiagnostic(diagnostic)
     }
     #else
+    // This is safe because swift-format can't process files in parallel on WASI.
     _printDiagnostic(diagnostic)
     #endif
   }

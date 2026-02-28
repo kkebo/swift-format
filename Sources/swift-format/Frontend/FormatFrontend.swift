@@ -66,6 +66,7 @@ class FormatFrontend: Frontend {
           #if !os(WASI)
           try bufferData.write(to: url, options: .atomic)
           #else
+          // `.atomic` is not yet supported on WASI.
           try bufferData.write(to: url)
           #endif
         }
