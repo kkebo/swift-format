@@ -295,7 +295,7 @@ class Frontend {
         processFile(filesToProcess[index])
       }
       #else
-      fatalError("not implemented")
+      fatalError("`--parallel` is not yet implemented on WASI.")
       #endif
     } else {
       FileIterator(urls: urls, followSymlinks: lintFormatOptions.followSymlinks)
