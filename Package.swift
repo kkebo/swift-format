@@ -42,8 +42,7 @@ var targets: [Target] = [
   .target(
     name: "SwiftFormat",
     dependencies: [
-      .target(name: "WASIHelpers", condition: .when(platforms: [.wasi])),
-      .product(name: "Markdown", package: "swift-markdown"),
+      .product(name: "Markdown", package: "swift-markdown")
     ]
       + swiftSyntaxDependencies([
         "SwiftOperators", "SwiftParser", "SwiftParserDiagnostics", "SwiftSyntax", "SwiftSyntaxBuilder",
@@ -62,9 +61,6 @@ var targets: [Target] = [
   .target(
     name: "_GenerateSwiftFormat",
     dependencies: ["SwiftFormat"]
-  ),
-  .target(
-    name: "WASIHelpers"
   ),
   .plugin(
     name: "Format Source Code",
