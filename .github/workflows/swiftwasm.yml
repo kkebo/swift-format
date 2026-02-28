@@ -5,8 +5,8 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.2"]
 env:
-  SWIFT_VERSION: 6.2.3
-  WASMTIME_VERSION: 39.0.1
+  SWIFT_VERSION: 6.2.4
+  WASMTIME_VERSION: 42.0.1
 permissions: {}
 defaults:
   run:
@@ -17,9 +17,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/swift-6.2.3-release/wasm-sdk/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE_wasm.artifactbundle.tar.gz
-              checksum: 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
-              id: swift-6.2.3-RELEASE_wasm
+              url: https://download.swift.org/swift-6.2.4-release/wasm-sdk/swift-6.2.4-RELEASE/swift-6.2.4-RELEASE_wasm.artifactbundle.tar.gz
+              checksum: 32fdb8772d73bb174f77b5c59bc88a0d55003d75712832129394d3465158fb43
+              id: swift-6.2.4-RELEASE_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -83,9 +83,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/swift-6.2.3-release/wasm-sdk/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE_wasm.artifactbundle.tar.gz
-              checksum: 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
-              id: swift-6.2.3-RELEASE_wasm
+              url: https://download.swift.org/swift-6.2.4-release/wasm-sdk/swift-6.2.4-RELEASE/swift-6.2.4-RELEASE_wasm.artifactbundle.tar.gz
+              checksum: 32fdb8772d73bb174f77b5c59bc88a0d55003d75712832129394d3465158fb43
+              id: swift-6.2.4-RELEASE_wasm
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
