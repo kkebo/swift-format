@@ -75,23 +75,13 @@ final class FileIteratorTests: XCTestCase {
   }
 
   override func tearDownWithError() throws {
-    #if os(WASI)  // WASI doesn't support recursive FileManager.removeItem
-    try FileManager.default.removeItem(at: tmpURL("project/real1.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/real2.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/.hidden.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/.build/generated.swift"))
-    // FIXME: try FileManager.default.removeItem(at: tmpURL("project/link.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/rellink.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/cycliclink.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/linktolink.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/2stepcyclebegin.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/2stepcycleend.swift"))
-    try FileManager.default.removeItem(at: tmpURL("project/.build/"))
-    try FileManager.default.removeItem(at: tmpURL("project/"))
-    try FileManager.default.removeItem(at: tmpdir)
-    #else
-    try FileManager.default.removeItem(at: tmpdir)
+    #if os(WASI)  // https://github.com/swiftlang/swift-foundation/pull/1786
+    let iter = FileManager.default.enumerator(at: tmpdir, includingPropertiesForKeys: nil)!
+    for url in iter.reversed().compactMap({ $0 as? URL }) {
+      try FileManager.default.removeItem(at: url)
+    }
     #endif
+    try FileManager.default.removeItem(at: tmpdir)
   }
 
   func testNoFollowSymlinks() throws {
