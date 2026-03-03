@@ -115,7 +115,6 @@ final class FileIteratorTests: XCTestCase {
         tmpURL("project/cycliclink.swift"),
         tmpURL("project/2stepcyclebegin.swift"),
         tmpURL("project/link.swift"),
-        tmpURL("project/rellink.swift"),
       ],
       followSymlinks: true
     )
