@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi-release/6.3"]
 env:
-  SWIFT_VERSION: 6.3-snapshot-2026-02-27
+  SWIFT_VERSION: 6.3-snapshot-2026-03-05
   WASMTIME_VERSION: 42.0.0
 permissions: {}
 defaults:
@@ -17,9 +17,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/swift-6.3-branch/wasm-sdk/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-02-27-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-02-27-a_wasm.artifactbundle.tar.gz
-              checksum: 27d2c371d578f961adc8ca2fd34763aa6aa52946b1d32f3594b680b4dab61f80
-              id: swift-6.3-DEVELOPMENT-SNAPSHOT-2026-02-27-a_wasm
+              url: https://download.swift.org/swift-6.3-branch/wasm-sdk/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a_wasm.artifactbundle.tar.gz
+              checksum: fb8744a343c02277d3f695a524b9ddc3fee18b96396282a84f7fcf875602bdc6
+              id: swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -81,9 +81,9 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/swift-6.3-branch/wasm-sdk/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-02-27-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-02-27-a_wasm.artifactbundle.tar.gz
-              checksum: 27d2c371d578f961adc8ca2fd34763aa6aa52946b1d32f3594b680b4dab61f80
-              id: swift-6.3-DEVELOPMENT-SNAPSHOT-2026-02-27-a_wasm
+              url: https://download.swift.org/swift-6.3-branch/wasm-sdk/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a/swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a_wasm.artifactbundle.tar.gz
+              checksum: fb8744a343c02277d3f695a524b9ddc3fee18b96396282a84f7fcf875602bdc6
+              id: swift-6.3-DEVELOPMENT-SNAPSHOT-2026-03-05-a_wasm
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
