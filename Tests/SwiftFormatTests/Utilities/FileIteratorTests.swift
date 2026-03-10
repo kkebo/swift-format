@@ -75,12 +75,6 @@ final class FileIteratorTests: XCTestCase {
   }
 
   override func tearDownWithError() throws {
-    #if os(WASI)  // https://github.com/swiftlang/swift-foundation/pull/1786
-    let iter = FileManager.default.enumerator(at: tmpdir, includingPropertiesForKeys: nil)!
-    for url in iter.reversed().compactMap({ $0 as? URL }) {
-      try FileManager.default.removeItem(at: url)
-    }
-    #endif
     try FileManager.default.removeItem(at: tmpdir)
   }
 
