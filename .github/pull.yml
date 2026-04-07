@@ -1,0 +1,142 @@
+version: "1"
+rules:
+  - base: main
+    upstream: swiftlang:main
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi
+    upstream: main
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.0.0
+    upstream: swiftlang:release/6.0.0
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.0.0
+    upstream: release/6.0.0
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.0.2
+    upstream: swiftlang:release/6.0.2
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.0.2
+    upstream: release/6.0.2
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.0
+    upstream: swiftlang:release/6.0
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.0
+    upstream: release/6.0
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.1
+    upstream: swiftlang:release/6.1
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.1
+    upstream: release/6.1
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.1.1
+    upstream: swiftlang:release/6.1.1
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.1.1
+    upstream: release/6.1.1
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.2
+    upstream: swiftlang:release/6.2
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.2
+    upstream: release/6.2
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.2.0
+    upstream: swiftlang:release/6.2.0
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.2.0
+    upstream: release/6.2.0
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.2.1
+    upstream: swiftlang:release/6.2.1
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.2.1
+    upstream: release/6.2.1
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: release/6.2.2
+    upstream: swiftlang:release/6.2.2
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.2.2
+    upstream: release/6.2.2
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
