@@ -42,7 +42,7 @@ jobs:
           WASMOPT_FLAGS: ${{ matrix.target.other-wasmopt-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
         run: |
-          swift build --product swift-format --swift-sdk "$SDK_ID" -c release
+          swift build --product swift-format --swift-sdk "$SDK_ID" -c release --build-system native
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
@@ -102,7 +102,7 @@ jobs:
         run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
       - env:
           SDK_ID: ${{ matrix.target.sdk.id }}
-        run: swift test --swift-sdk "$SDK_ID" --toolset wasi-test-toolset.json
+        run: swift test --swift-sdk "$SDK_ID" --toolset wasi-test-toolset.json --build-system native
   results:
     if: ${{ always() }}
     runs-on: ubuntu-24.04-arm
