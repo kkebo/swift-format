@@ -14,6 +14,12 @@ import Foundation
 @_spi(Testing) @_spi(Internal) import SwiftFormat
 import Testing
 
+#if os(WASI)
+private let usesAtomicWriting = false
+#else
+private let usesAtomicWriting = true
+#endif
+
 /// Tests for Frontend integration with .swift-format-ignore files
 @Suite
 struct FrontendIgnoreTests {
@@ -34,27 +40,27 @@ struct FrontendIgnoreTests {
 
     // Create test Swift files
     let testFile1 = tempDir.appendingPathComponent("Test.swift")
-    try "class Test {}".write(to: testFile1, atomically: true, encoding: .utf8)
+    try "class Test {}".write(to: testFile1, atomically: usesAtomicWriting, encoding: .utf8)
 
     let ignoredFile = tempDir.appendingPathComponent("Generated.swift")
-    try "class Generated {}".write(to: ignoredFile, atomically: true, encoding: .utf8)
+    try "class Generated {}".write(to: ignoredFile, atomically: usesAtomicWriting, encoding: .utf8)
 
     // Create subdirectory with files
     let subDir = tempDir.appendingPathComponent("src")
     try FileManager.default.createDirectory(at: subDir, withIntermediateDirectories: true)
 
     let subFile1 = subDir.appendingPathComponent("Main.swift")
-    try "class Main {}".write(to: subFile1, atomically: true, encoding: .utf8)
+    try "class Main {}".write(to: subFile1, atomically: usesAtomicWriting, encoding: .utf8)
 
     let subFile2 = subDir.appendingPathComponent("Helper.swift")
-    try "class Helper {}".write(to: subFile2, atomically: true, encoding: .utf8)
+    try "class Helper {}".write(to: subFile2, atomically: usesAtomicWriting, encoding: .utf8)
 
     // Create build directory that should be ignored
     let buildDir = tempDir.appendingPathComponent("build")
     try FileManager.default.createDirectory(at: buildDir, withIntermediateDirectories: true)
 
     let buildFile = buildDir.appendingPathComponent("Build.swift")
-    try "class Build {}".write(to: buildFile, atomically: true, encoding: .utf8)
+    try "class Build {}".write(to: buildFile, atomically: usesAtomicWriting, encoding: .utf8)
 
     return try closure(tempDir)
   }
@@ -65,7 +71,7 @@ struct FrontendIgnoreTests {
     try withTestDirectory { testDir in
       // Create .swift-format-ignore file
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "Generated.swift\nbuild/".write(to: ignoreFile, atomically: true, encoding: .utf8)
+      try "Generated.swift\nbuild/".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
 
       // Test that FileIterator respects ignore files when used through Frontend
       // We'll test this by collecting all files that FileIterator would discover
@@ -93,12 +99,12 @@ struct FrontendIgnoreTests {
     try withTestDirectory { testDir in
       // Create root .swift-format-ignore
       let rootIgnore = testDir.appendingPathComponent(".swift-format-ignore")
-      try "Generated.swift".write(to: rootIgnore, atomically: true, encoding: .utf8)
+      try "Generated.swift".write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
 
       // Create nested .swift-format-ignore that has additional rules
       let srcDir = testDir.appendingPathComponent("src")
       let nestedIgnore = srcDir.appendingPathComponent(".swift-format-ignore")
-      try "Helper.swift".write(to: nestedIgnore, atomically: true, encoding: .utf8)
+      try "Helper.swift".write(to: nestedIgnore, atomically: usesAtomicWriting, encoding: .utf8)
 
       // Test FileIterator with ignore functionality
       let urls = [testDir]
