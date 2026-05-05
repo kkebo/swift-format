@@ -42,3 +42,17 @@ rules:
       - kkebo
     reviewers:
       - kkebo
+  - base: release/6.4.x
+    upstream: swiftlang:release/6.4.x
+    mergeMethod: hardreset
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
+  - base: wasm32-wasi-release/6.4.x
+    upstream: release/6.4.x
+    mergeMethod: merge
+    assignees:
+      - kkebo
+    reviewers:
+      - kkebo
