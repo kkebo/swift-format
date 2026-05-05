@@ -329,7 +329,10 @@ class Frontend {
     if parallel {
       #if !os(WASI)
       let filesToProcess =
-        FileIterator(urls: urls, followSymlinks: lintFormatOptions.followSymlinks)
+        FileIterator(
+          urls: urls,
+          followSymlinks: lintFormatOptions.followSymlinks
+        )
         .compactMap(openAndPrepareFile)
       DispatchQueue.concurrentPerform(iterations: filesToProcess.count) { index in
         processFile(filesToProcess[index])
@@ -338,10 +341,13 @@ class Frontend {
       fatalError("`--parallel` is not yet implemented on WASI.")
       #endif
     } else {
-      FileIterator(urls: urls, followSymlinks: lintFormatOptions.followSymlinks)
-        .lazy
-        .compactMap(openAndPrepareFile)
-        .forEach(processFile)
+      FileIterator(
+        urls: urls,
+        followSymlinks: lintFormatOptions.followSymlinks
+      )
+      .lazy
+      .compactMap(openAndPrepareFile)
+      .forEach(processFile)
     }
   }
 
