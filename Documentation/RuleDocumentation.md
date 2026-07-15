@@ -83,7 +83,7 @@ Underscores are allowed in the names of test functions, where they are commonly 
 separate phrases in long, descriptive names. The lower camel-case requirement still applies
 otherwise, so a test function name that begins with a capital letter is still diagnosed. Test
 functions are functions that either:
-  * start with `test` in a file containing `import XCTest`, or
+  * start with `test` in a file that imports a supported test library, or
   * are marked with the `@Test` attribute.
 
 Lint: If an identifier contains underscores or begins with a capital letter, a lint error is
@@ -193,7 +193,7 @@ Lint: If an identifier contains non-ASCII characters, a lint error is raised.
 Force-unwraps are strongly discouraged and must be documented.
 
 This rule does not apply to test code, defined as code which:
-  * Contains the line `import XCTest`
+  * Imports a supported test library
   * The function is marked with `@Test` attribute
 
 Lint: If a force unwrap is used, a lint warning is raised.
@@ -205,7 +205,7 @@ Lint: If a force unwrap is used, a lint warning is raised.
 Force-try (`try!`) is forbidden.
 
 This rule does not apply to test code, defined as code which:
-  * Contains the line `import XCTest`
+  * Imports a supported test library
   * The function is marked with `@Test` attribute
 
 Lint: Using `try!` results in a lint error.
@@ -221,7 +221,7 @@ Implicitly unwrapped optionals (e.g. `var s: String!`) are forbidden.
 Certain properties (e.g. `@IBOutlet`) tied to the UI lifecycle are ignored.
 
 This rule does not apply to test code, defined as code which:
-  * Contains the line `import XCTest`
+  * Imports a supported test library
   * The function is marked with `@Test` attribute
 
 TODO: Create exceptions for other UI elements (ex: viewDidLoad)
