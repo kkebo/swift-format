@@ -19,7 +19,6 @@ jobs:
           - sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-07-11-a/swift-DEVELOPMENT-SNAPSHOT-2026-07-11-a_wasm.artifactbundle.tar.gz
               checksum: 6a6e928fdd939d1120aa36a5b54085835137d682c1d4c0c3a1e49a8f7ea7d977
-              id: swift-DEVELOPMENT-SNAPSHOT-2026-07-11-a_wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
     runs-on: ubuntu-24.04-arm
@@ -38,11 +37,10 @@ jobs:
         run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
       - name: Build
         env:
-          SDK_ID: ${{ matrix.target.sdk.id }}
           WASMOPT_FLAGS: ${{ matrix.target.other-wasmopt-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
         run: |
-          swift build --product swift-format --swift-sdk "$SDK_ID" -c release --build-system native
+          swift build --product swift-format --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" -c release --build-system native
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
@@ -83,7 +81,6 @@ jobs:
           - sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-07-11-a/swift-DEVELOPMENT-SNAPSHOT-2026-07-11-a_wasm.artifactbundle.tar.gz
               checksum: 6a6e928fdd939d1120aa36a5b54085835137d682c1d4c0c3a1e49a8f7ea7d977
-              id: swift-DEVELOPMENT-SNAPSHOT-2026-07-11-a_wasm
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
@@ -100,9 +97,7 @@ jobs:
           SDK_URL: ${{ matrix.target.sdk.url }}
           SDK_CHECKSUM: ${{ matrix.target.sdk.checksum }}
         run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
-      - env:
-          SDK_ID: ${{ matrix.target.sdk.id }}
-        run: swift test --swift-sdk "$SDK_ID" --toolset wasi-test-toolset.json --build-system native
+      - run: swift test --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" --toolset wasi-test-toolset.json --build-system native
   results:
     if: ${{ always() }}
     runs-on: ubuntu-24.04-arm
