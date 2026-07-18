@@ -6,7 +6,6 @@ on:
     branches: ["wasm32-wasi"]
 env:
   SWIFT_VERSION: main-snapshot-2026-07-11
-  WASMTIME_VERSION: 47.0.3
 permissions: {}
 defaults:
   run:
@@ -88,11 +87,7 @@ jobs:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3  # v6.0.0
       - run: ./.github/scripts/ci-install-swiftly.sh
       - run: swiftly install -y --use "$SWIFT_VERSION"
-      - uses: bytecodealliance/actions/wasmtime/setup@6aecabac1eb1dcf7ed94ba9471974415ee2ebef2  # v1.1.2
-        with:
-          version: ${{ env.WASMTIME_VERSION }}
       - run: swift --version
-      - run: wasmtime -V
       - env:
           SDK_URL: ${{ matrix.target.sdk.url }}
           SDK_CHECKSUM: ${{ matrix.target.sdk.checksum }}
