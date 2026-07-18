@@ -158,14 +158,7 @@ struct IgnoreEdgeCaseTests {
 
       // Create a symlink to the real file
       let symlinkFile = testDir.appendingPathComponent("SymlinkFile.swift")
-      #if os(WASI)
-      try FileManager.default.createSymbolicLink(
-        atPath: symlinkFile.path(percentEncoded: false),
-        withDestinationPath: "RealFile.swift"
-      )
-      #else
       try FileManager.default.createSymbolicLink(at: symlinkFile, withDestinationURL: realFile)
-      #endif
 
       // Create ignore file that ignores symlinks
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
