@@ -24,7 +24,7 @@ extension Parser {
   @_spi(Testing)
   public static func parse(
     source: String,
-    experimentalFeatures: Parser.ExperimentalFeatures
+    experimentalFeatures: Parser.LanguageFeatures
   ) -> SourceFileSyntax {
     var source = source
     return source.withUTF8 { sourceBytes in
