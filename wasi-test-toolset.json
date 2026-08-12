@@ -3,8 +3,9 @@
     "testRunner": {
         "path": "/usr/bin/env",
         "extraCLIOptions": [
-            "wasmtime",
+            "wasmkit",
             "run",
+            "--dir", ".build",
             "--dir", "/"
         ]
     }
