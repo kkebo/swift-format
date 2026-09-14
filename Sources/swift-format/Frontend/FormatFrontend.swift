@@ -12,7 +12,7 @@
 
 import Foundation
 import SwiftDiagnostics
-import SwiftFormat
+@_spi(Internal) import SwiftFormat
 import SwiftSyntax
 
 /// The frontend for formatting operations.
@@ -64,9 +64,9 @@ class FormatFrontend: Frontend {
         if buffer != source {
           let bufferData = buffer.data(using: .utf8)!  // Conversion to UTF-8 cannot fail
           #if !os(WASI)
-          try bufferData.write(to: url, options: .atomic)
+          try bufferData.writeAtomicallyPreservingPermissions(to: url)
           #else
-          // `.atomic` is not yet supported on WASI.
+          // WASI does not support atomic file-writing (temporary directories) and POSIX permissions.
           try bufferData.write(to: url)
           #endif
         }
