@@ -39,7 +39,7 @@ jobs:
           WASMOPT_FLAGS: ${{ matrix.target.other-wasmopt-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
         run: |
-          swift build --product swift-format --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" -c release --build-system native
+          swift build --product swift-format --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" -c release
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
@@ -92,7 +92,7 @@ jobs:
           SDK_URL: ${{ matrix.target.sdk.url }}
           SDK_CHECKSUM: ${{ matrix.target.sdk.checksum }}
         run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
-      - run: swift test --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" --toolset wasi-test-toolset.json --build-system native
+      - run: swift test --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" --toolset wasi-test-toolset.json
   results:
     if: ${{ always() }}
     runs-on: ubuntu-24.04-arm
