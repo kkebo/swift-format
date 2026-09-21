@@ -69,10 +69,14 @@ jobs:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
         run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" --version
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3  # v6.0.0
+        with:
+          repository: swiftlang/swift-syntax
+          path: swift-syntax
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" lint -r .
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" lint -r swift-syntax
   test:
     strategy:
       matrix:
