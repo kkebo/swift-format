@@ -16,6 +16,10 @@ import Foundation
 import WinSDK
 #endif
 
+#if os(WASI)
+import WASIHelpers
+#endif
+
 /// Iterator for looping over lists of files and directories. Directories are automatically
 /// traversed recursively, and we check for files with a ".swift" extension.
 @_spi(Internal)
@@ -111,11 +115,19 @@ public struct FileIterator: Sequence, IteratorProtocol {
           if self.ignoreManager.shouldIgnore(file: next, isDirectory: true) {
             continue
           }
+          #if !os(WASI)
           dirIterator = FileManager.default.enumerator(
             at: next,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
           )
+          #else
+          dirIterator = FileManager.default.enumeratorWASI(
+            at: next,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+          )
+          #endif
           currentDirectory = next
 
         default:
