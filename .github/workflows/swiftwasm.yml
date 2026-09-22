@@ -2,6 +2,7 @@ name: SwiftWasm
 on:
   push:
     branches: ["wasm32-wasi"]
+    tags: ["*-wasm32-wasi"]
   pull_request:
     branches: ["wasm32-wasi"]
 env:
