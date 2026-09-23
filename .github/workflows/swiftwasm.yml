@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_VERSION: main-snapshot-2026-09-10
+  SWIFT_VERSION: main-snapshot-2026-09-21
   STACK_SIZE: 4194304
 permissions: {}
 defaults:
@@ -18,10 +18,17 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-10-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-10-a_wasm.artifactbundle.tar.gz
-              checksum: 37e97119563bb3fd9c57fc5138fe568a7d4714eafbf07619f03cf4359c6e15f0
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a_wasm.artifactbundle.tar.gz
+              checksum: 7a3c451bcaaf06c1ac5856e9215beefed8cba99766b5ce9e170109b0211c27a7
+              suffix: _wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
+          - sdk:
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a_wasm.artifactbundle.tar.gz
+              checksum: 7a3c451bcaaf06c1ac5856e9215beefed8cba99766b5ce9e170109b0211c27a7
+              suffix: _wasm-threads
+            artifact-name: swift-format-threads.wasm
+            other-wasmopt-flags: --enable-threads
     runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
@@ -40,8 +47,9 @@ jobs:
         env:
           WASMOPT_FLAGS: ${{ matrix.target.other-wasmopt-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
+          SDK_SUFFIX: ${{ matrix.target.sdk.suffix }}
         run: |
-          swift build --product swift-format --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" -c release -Xlinker -z -Xlinker stack-size="$STACK_SIZE"
+          swift build --product swift-format --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')$SDK_SUFFIX" -c release -Xlinker -z -Xlinker stack-size="$STACK_SIZE"
           wasm-strip .build/release/swift-format.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-sign-ext --enable-nontrapping-float-to-int $WASMOPT_FLAGS .build/release/swift-format.wasm -o "$ARTIFACT_NAME"
       - name: Upload ${{ matrix.target.artifact-name }}
@@ -56,6 +64,9 @@ jobs:
         target:
           - artifact-name: swift-format.wasm
             other-wasmkit-flags:
+    # TODO: To run a wasp1-threads binary, WasmKit 0.4.0 is required. WasmKit included in the Swift toolchain is still 0.3.1.
+    #       - artifact-name: swift-format-threads.wasm
+    #         other-wasmkit-flags:
     runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
@@ -87,8 +98,14 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-10-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-10-a_wasm.artifactbundle.tar.gz
-              checksum: 37e97119563bb3fd9c57fc5138fe568a7d4714eafbf07619f03cf4359c6e15f0
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a_wasm.artifactbundle.tar.gz
+              checksum: 7a3c451bcaaf06c1ac5856e9215beefed8cba99766b5ce9e170109b0211c27a7
+              suffix: _wasm
+    # TODO: To run a wasp1-threads binary, WasmKit 0.4.0 is required. WasmKit included in the Swift toolchain is still 0.3.1.
+    #       - sdk:
+    #           url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-21-a_wasm.artifactbundle.tar.gz
+    #           checksum: 7a3c451bcaaf06c1ac5856e9215beefed8cba99766b5ce9e170109b0211c27a7
+    #           suffix: _wasm-threads
     runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
@@ -101,7 +118,9 @@ jobs:
           SDK_URL: ${{ matrix.target.sdk.url }}
           SDK_CHECKSUM: ${{ matrix.target.sdk.checksum }}
         run: swift sdk install "$SDK_URL" --checksum "$SDK_CHECKSUM"
-      - run: swift test --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" --toolset wasi-test-toolset.json
+      - env:
+          SDK_SUFFIX: ${{ matrix.target.sdk.suffix }}
+        run: swift test --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')$SDK_SUFFIX" --toolset wasi-test-toolset.json
   results:
     if: ${{ always() }}
     runs-on: ubuntu-26.04-arm
