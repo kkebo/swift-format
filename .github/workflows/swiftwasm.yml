@@ -22,7 +22,7 @@ jobs:
               checksum: 37e97119563bb3fd9c57fc5138fe568a7d4714eafbf07619f03cf4359c6e15f0
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
     steps:
@@ -56,7 +56,7 @@ jobs:
         target:
           - artifact-name: swift-format.wasm
             other-wasmkit-flags:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
     steps:
@@ -89,7 +89,7 @@ jobs:
           - sdk:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-09-10-a/swift-DEVELOPMENT-SNAPSHOT-2026-09-10-a_wasm.artifactbundle.tar.gz
               checksum: 37e97119563bb3fd9c57fc5138fe568a7d4714eafbf07619f03cf4359c6e15f0
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
     steps:
@@ -104,7 +104,7 @@ jobs:
       - run: swift test --swift-sdk "$(swiftc -print-target-info | jq -r '.swiftCompilerTag')_wasm" --toolset wasi-test-toolset.json
   results:
     if: ${{ always() }}
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     needs: [build, test-binary, test]
     steps:
       - run: exit 1
