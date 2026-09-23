@@ -55,7 +55,7 @@ jobs:
       matrix:
         target:
           - artifact-name: swift-format.wasm
-            other-wasmkit-flags: --dir .
+            other-wasmkit-flags:
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
@@ -70,7 +70,7 @@ jobs:
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run $WASMKIT_FLAGS "$ARTIFACT_NAME" --version
+        run: wasmkit run --dir . $WASMKIT_FLAGS "$ARTIFACT_NAME" --version
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3  # v6.0.0
         with:
           repository: swiftlang/swift
@@ -81,7 +81,7 @@ jobs:
       - env:
           WASMKIT_FLAGS: ${{ matrix.target.other-wasmkit-flags }}
           ARTIFACT_NAME: ${{ matrix.target.artifact-name }}
-        run: wasmkit run --stack-size "$STACK_SIZE" $WASMKIT_FLAGS "$ARTIFACT_NAME" lint -r --ignore-unparsable-files swift/test
+        run: wasmkit run --dir . --stack-size "$STACK_SIZE" $WASMKIT_FLAGS "$ARTIFACT_NAME" lint -r --ignore-unparsable-files swift/test
   test:
     strategy:
       matrix:
