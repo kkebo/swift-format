@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: ["wasm32-wasi"]
 env:
-  SWIFT_VERSION: main-snapshot-2026-10-02
+  SWIFT_VERSION: main-snapshot-2026-10-06
   STACK_SIZE: 4194304
 permissions: {}
 defaults:
@@ -18,14 +18,14 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a_wasm.artifactbundle.tar.gz
-              checksum: 1ce34b83400b2792ec962ddec517aaf41c759e752b05320d9db20e1e79c472f0
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a_wasm.artifactbundle.tar.gz
+              checksum: c701bd87f6b1d5e5100b53f1a639231a8eaba0c0ef123bfabfec3dcdb6127d29
               suffix: _wasm
             artifact-name: swift-format.wasm
             other-wasmopt-flags:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a_wasm.artifactbundle.tar.gz
-              checksum: 1ce34b83400b2792ec962ddec517aaf41c759e752b05320d9db20e1e79c472f0
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a_wasm.artifactbundle.tar.gz
+              checksum: c701bd87f6b1d5e5100b53f1a639231a8eaba0c0ef123bfabfec3dcdb6127d29
               suffix: _wasm-threads
             artifact-name: swift-format-threads.wasm
             other-wasmopt-flags: --enable-threads
@@ -98,13 +98,13 @@ jobs:
       matrix:
         target:
           - sdk:
-              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a_wasm.artifactbundle.tar.gz
-              checksum: 1ce34b83400b2792ec962ddec517aaf41c759e752b05320d9db20e1e79c472f0
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a_wasm.artifactbundle.tar.gz
+              checksum: c701bd87f6b1d5e5100b53f1a639231a8eaba0c0ef123bfabfec3dcdb6127d29
               suffix: _wasm
     # TODO: To run a wasp1-threads binary, WasmKit 0.4.0 is required. WasmKit included in the Swift toolchain is still 0.3.1.
     #       - sdk:
-    #           url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-02-a_wasm.artifactbundle.tar.gz
-    #           checksum: 1ce34b83400b2792ec962ddec517aaf41c759e752b05320d9db20e1e79c472f0
+    #           url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-06-a_wasm.artifactbundle.tar.gz
+    #           checksum: c701bd87f6b1d5e5100b53f1a639231a8eaba0c0ef123bfabfec3dcdb6127d29
     #           suffix: _wasm-threads
     runs-on: ubuntu-26.04-arm
     permissions:
