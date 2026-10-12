@@ -64,9 +64,8 @@ jobs:
         target:
           - artifact-name: swift-format.wasm
             other-wasmkit-flags:
-    # TODO: To run a wasp1-threads binary, WasmKit 0.4.0 is required. WasmKit included in the Swift toolchain is still 0.3.1.
-    #       - artifact-name: swift-format-threads.wasm
-    #         other-wasmkit-flags:
+          - artifact-name: swift-format-threads.wasm
+            other-wasmkit-flags:
     runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
@@ -101,11 +100,10 @@ jobs:
               url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-17-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-17-a_wasm.artifactbundle.tar.gz
               checksum: 76cda74e3d75d44435e55673167ea537615689c381b482c0d90050198f48a4b0
               suffix: _wasm
-    # TODO: To run a wasp1-threads binary, WasmKit 0.4.0 is required. WasmKit included in the Swift toolchain is still 0.3.1.
-    #       - sdk:
-    #           url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-17-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-17-a_wasm.artifactbundle.tar.gz
-    #           checksum: 76cda74e3d75d44435e55673167ea537615689c381b482c0d90050198f48a4b0
-    #           suffix: _wasm-threads
+          - sdk:
+              url: https://download.swift.org/development/wasm-sdk/swift-DEVELOPMENT-SNAPSHOT-2026-10-17-a/swift-DEVELOPMENT-SNAPSHOT-2026-10-17-a_wasm.artifactbundle.tar.gz
+              checksum: 76cda74e3d75d44435e55673167ea537615689c381b482c0d90050198f48a4b0
+              suffix: _wasm-threads
     runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
