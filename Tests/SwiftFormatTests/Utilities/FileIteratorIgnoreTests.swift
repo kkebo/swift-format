@@ -14,12 +14,7 @@ import Foundation
 @_spi(Testing) import SwiftFormat
 @_spi(Internal) import SwiftFormat
 import Testing
-
-#if os(WASI)
-private let usesAtomicWriting = false
-#else
-private let usesAtomicWriting = true
-#endif
+import _SwiftFormatTestSupport
 
 @Suite
 struct FileIteratorIgnoreTests {
@@ -33,13 +28,13 @@ struct FileIteratorIgnoreTests {
       let fileB = tempDir.appendingPathComponent("FileB.generated.swift")
       let fileC = tempDir.appendingPathComponent("FileC.swift")
 
-      try "// FileA".write(to: fileA, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// FileB Generated".write(to: fileB, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// FileC".write(to: fileC, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("// FileA", to: fileA, encoding: .utf8)
+      try writeAtomicallyIfPossible("// FileB Generated", to: fileB, encoding: .utf8)
+      try writeAtomicallyIfPossible("// FileC", to: fileC, encoding: .utf8)
 
       // Create ignore file
       let ignoreFile = tempDir.appendingPathComponent(".swift-format-ignore")
-      try "*.generated.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("*.generated.swift", to: ignoreFile, encoding: .utf8)
 
       // Create FileIterator with ignore support
       var iterator = FileIterator(
@@ -68,8 +63,8 @@ struct FileIteratorIgnoreTests {
       let fileA = tempDir.appendingPathComponent("FileA.swift")
       let fileB = tempDir.appendingPathComponent("FileB.generated.swift")
 
-      try "// FileA".write(to: fileA, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// FileB Generated".write(to: fileB, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("// FileA", to: fileA, encoding: .utf8)
+      try writeAtomicallyIfPossible("// FileB Generated", to: fileB, encoding: .utf8)
 
       // Create FileIterator without ignore support
       var iterator = FileIterator(urls: [tempDir], followSymlinks: false, workingDirectory: tempDir)
@@ -101,18 +96,18 @@ struct FileIteratorIgnoreTests {
       let testFile = testDir.appendingPathComponent("Test.swift")
       let testGeneratedFile = testDir.appendingPathComponent("TestGenerated.swift")
 
-      try "// Main".write(to: mainFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// Generated".write(to: generatedFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// Test".write(to: testFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// TestGenerated".write(to: testGeneratedFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Main", to: mainFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Generated", to: generatedFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Test", to: testFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// TestGenerated", to: testGeneratedFile, encoding: .utf8)
 
       // Root ignore: ignore Generated.swift files
       let rootIgnore = tempDir.appendingPathComponent(".swift-format-ignore")
-      try "Generated.swift".write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("Generated.swift", to: rootIgnore, encoding: .utf8)
 
       // Test ignore: allow TestGenerated.swift (negation)
       let testIgnore = testDir.appendingPathComponent(".swift-format-ignore")
-      try "!TestGenerated.swift".write(to: testIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("!TestGenerated.swift", to: testIgnore, encoding: .utf8)
 
       // Create FileIterator with ignore support
       var iterator = FileIterator(
@@ -157,31 +152,35 @@ struct FileIteratorIgnoreTests {
         fixtureSubDir.appendingPathComponent("myfixture_shouldIgnore_\($0).swift")
       }
 
-      try "// root".write(to: rootFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// source 1".write(to: srcFile1, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// source 2".write(to: srcFile2, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// fixture keep".write(to: fixtureSubFile1, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// fixture keep negated in subdirectory".write(
+      try writeAtomicallyIfPossible("// root", to: rootFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// source 1", to: srcFile1, encoding: .utf8)
+      try writeAtomicallyIfPossible("// source 2", to: srcFile2, encoding: .utf8)
+      try writeAtomicallyIfPossible("// fixture keep", to: fixtureSubFile1, encoding: .utf8)
+      try writeAtomicallyIfPossible(
+        "// fixture keep negated in subdirectory",
         to: fixtureSubFile2,
-        atomically: usesAtomicWriting,
         encoding: .utf8
       )
       for (index, file) in fixtureFiles.enumerated() {
-        try "// fixture ignore \(index)".write(to: file, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("// fixture ignore \(index)", to: file, encoding: .utf8)
       }
 
       // Ignore source directory at root, but negate non-ignored files
       let rootIgnore = tempDir.appendingPathComponent(".swift-format-ignore")
-      try """
-      src/
-      Fixture/
-      """.write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible(
+        """
+        src/
+        Fixture/
+        """,
+        to: rootIgnore,
+        encoding: .utf8
+      )
       let srcIgnore = srcDir.appendingPathComponent(".swift-format-ignore")
-      try "!include*.swift".write(to: srcIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("!include*.swift", to: srcIgnore, encoding: .utf8)
       let fixtureIgnore = fixtureDir.appendingPathComponent(".swift-format-ignore")
-      try "!MyFix/*-keep.swift".write(to: fixtureIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("!MyFix/*-keep.swift", to: fixtureIgnore, encoding: .utf8)
       let fixtureSubIgnore = fixtureSubDir.appendingPathComponent(".swift-format-ignore")
-      try "!*-negate-in-subdir.swift".write(to: fixtureSubIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("!*-negate-in-subdir.swift", to: fixtureSubIgnore, encoding: .utf8)
 
       var iterator = FileIterator(
         urls: [tempDir],
@@ -236,13 +235,13 @@ struct FileIteratorIgnoreTests {
       let srcFile = srcDir.appendingPathComponent("Source.swift")
       let rootFile = tempDir.appendingPathComponent("build.swift")  // File, not directory
 
-      try "// Build".write(to: buildFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// Source".write(to: srcFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// Root build file".write(to: rootFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Build", to: buildFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Source", to: srcFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Root build file", to: rootFile, encoding: .utf8)
 
       // Ignore build directory, but not build files
       let ignoreFile = tempDir.appendingPathComponent(".swift-format-ignore")
-      try "build/".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("build/", to: ignoreFile, encoding: .utf8)
 
       // Create FileIterator with ignore support
       var iterator = FileIterator(
@@ -279,21 +278,21 @@ struct FileIteratorIgnoreTests {
       let testFile = mainDir.appendingPathComponent("Root.has.this.ignore.swift")
       let utilFile = srcDir.appendingPathComponent("src.util.test.swift")
 
-      try "// Main".write(to: mainFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// Test Generated".write(to: testFile, atomically: usesAtomicWriting, encoding: .utf8)
-      try "// Util Test".write(to: utilFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Main", to: mainFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Test Generated", to: testFile, encoding: .utf8)
+      try writeAtomicallyIfPossible("// Util Test", to: utilFile, encoding: .utf8)
 
       // Create .swift-format-ignore at root level (should be ignored due to project boundary)
       let rootIgnore = tempDir.appendingPathComponent(".swift-format-ignore")
-      try "*.ignore.swift".write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("*.ignore.swift", to: rootIgnore, encoding: .utf8)
 
       // Create .swift-format configuration file at project level (creates boundary)
       let projectConfig = projectDir.appendingPathComponent(".swift-format")
-      try "{}".write(to: projectConfig, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("{}", to: projectConfig, encoding: .utf8)
 
       // Create .swift-format-ignore at src level (should be respected)
       let srcIgnore = srcDir.appendingPathComponent(".swift-format-ignore")
-      try "*.test.swift".write(to: srcIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("*.test.swift", to: srcIgnore, encoding: .utf8)
 
       // Create FileIterator with ignore support
       var iterator = FileIterator(
