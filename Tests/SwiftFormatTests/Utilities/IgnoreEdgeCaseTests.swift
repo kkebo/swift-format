@@ -13,12 +13,7 @@
 import Foundation
 @_spi(Internal) import SwiftFormat
 import Testing
-
-#if os(WASI)
-private let usesAtomicWriting = false
-#else
-private let usesAtomicWriting = true
-#endif
+import _SwiftFormatTestSupport
 
 /// Tests for edge cases and error handling in .swift-format-ignore functionality
 @Suite
@@ -53,17 +48,17 @@ struct IgnoreEdgeCaseTests {
         !ValidNegation.swift
         # Another comment
         """
-      try invalidPatterns.write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible(invalidPatterns, to: ignoreFile, encoding: .utf8)
 
       // Create test files
       let validFile = testDir.appendingPathComponent("ValidFile.swift")
-      try "class ValidFile {}".write(to: validFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class ValidFile {}", to: validFile, encoding: .utf8)
 
       let negationFile = testDir.appendingPathComponent("ValidNegation.swift")
-      try "class ValidNegation {}".write(to: negationFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class ValidNegation {}", to: negationFile, encoding: .utf8)
 
       let otherFile = testDir.appendingPathComponent("Other.swift")
-      try "class Other {}".write(to: otherFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Other {}", to: otherFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -78,11 +73,11 @@ struct IgnoreEdgeCaseTests {
     try withTestDirectory { testDir in
       // Create empty ignore file
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("", to: ignoreFile, encoding: .utf8)
 
       // Create test file
       let testFile = testDir.appendingPathComponent("Test.swift")
-      try "class Test {}".write(to: testFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Test {}", to: testFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -104,11 +99,11 @@ struct IgnoreEdgeCaseTests {
 
         # Final comment
         """
-      try content.write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible(content, to: ignoreFile, encoding: .utf8)
 
       // Create test file
       let testFile = testDir.appendingPathComponent("Test.swift")
-      try "class Test {}".write(to: testFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Test {}", to: testFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -123,7 +118,7 @@ struct IgnoreEdgeCaseTests {
     try withTestDirectory { testDir in
       // Create test file without any ignore file
       let testFile = testDir.appendingPathComponent("Test.swift")
-      try "class Test {}".write(to: testFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Test {}", to: testFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -136,7 +131,7 @@ struct IgnoreEdgeCaseTests {
     try withTestDirectory { testDir in
       // Create ignore file
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "*.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("*.swift", to: ignoreFile, encoding: .utf8)
 
       // Test with non-existent file
       let nonExistentFile = testDir.appendingPathComponent("NonExistent.swift")
@@ -154,7 +149,7 @@ struct IgnoreEdgeCaseTests {
     try withTestDirectory { testDir in
       // Create a real file
       let realFile = testDir.appendingPathComponent("RealFile.swift")
-      try "class RealFile {}".write(to: realFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class RealFile {}", to: realFile, encoding: .utf8)
 
       // Create a symlink to the real file
       let symlinkFile = testDir.appendingPathComponent("SymlinkFile.swift")
@@ -162,7 +157,7 @@ struct IgnoreEdgeCaseTests {
 
       // Create ignore file that ignores symlinks
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "SymlinkFile.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("SymlinkFile.swift", to: ignoreFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -189,14 +184,14 @@ struct IgnoreEdgeCaseTests {
         patterns.append("build/Output\(i).swift")
       }
 
-      try patterns.joined(separator: "\n").write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible(patterns.joined(separator: "\n"), to: ignoreFile, encoding: .utf8)
 
       // Create test files
       let matchedFile = testDir.appendingPathComponent("Generated500.swift")
-      try "class Generated500 {}".write(to: matchedFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Generated500 {}", to: matchedFile, encoding: .utf8)
 
       let unmatchedFile = testDir.appendingPathComponent("Regular.swift")
-      try "class Regular {}".write(to: unmatchedFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Regular {}", to: unmatchedFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -215,13 +210,13 @@ struct IgnoreEdgeCaseTests {
       try FileManager.default.createDirectory(at: specialDir, withIntermediateDirectories: true)
 
       let specialFile = specialDir.appendingPathComponent("file with spaces & symbols.swift")
-      try "class SpecialFile {}".write(to: specialFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class SpecialFile {}", to: specialFile, encoding: .utf8)
 
       // Create ignore file
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "special-chars & spaces/file with spaces & symbols.swift".write(
+      try writeAtomicallyIfPossible(
+        "special-chars & spaces/file with spaces & symbols.swift",
         to: ignoreFile,
-        atomically: usesAtomicWriting,
         encoding: .utf8
       )
 
@@ -238,13 +233,13 @@ struct IgnoreEdgeCaseTests {
     try withTestDirectory { testDir in
       // Create ignore file
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "*.generated".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("*.generated", to: ignoreFile, encoding: .utf8)
 
       // Create test files
       let file1 = testDir.appendingPathComponent("File1.generated")
       let file2 = testDir.appendingPathComponent("File2.generated")
-      try "content1".write(to: file1, atomically: usesAtomicWriting, encoding: .utf8)
-      try "content2".write(to: file2, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("content1", to: file1, encoding: .utf8)
+      try writeAtomicallyIfPossible("content2", to: file2, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -255,7 +250,7 @@ struct IgnoreEdgeCaseTests {
       #expect(ignoreManager.shouldIgnore(file: file2, isDirectory: false))
 
       // Verify caching by modifying the file after first load
-      try "# modified content\n*.different".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("# modified content\n*.different", to: ignoreFile, encoding: .utf8)
 
       // Should still use cached version
       #expect(ignoreManager.shouldIgnore(file: file1, isDirectory: false))
@@ -268,11 +263,11 @@ struct IgnoreEdgeCaseTests {
     try withTestDirectory { testDir in
       // Create file with unicode characters
       let unicodeFile = testDir.appendingPathComponent("测试文件.swift")
-      try "class TestFile {}".write(to: unicodeFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class TestFile {}", to: unicodeFile, encoding: .utf8)
 
       // Create ignore file with unicode pattern
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "测试文件.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("测试文件.swift", to: ignoreFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 
@@ -291,11 +286,11 @@ struct IgnoreEdgeCaseTests {
       try FileManager.default.createDirectory(at: deepDir, withIntermediateDirectories: true)
 
       let deepFile = deepDir.appendingPathComponent("Deep.swift")
-      try "class Deep {}".write(to: deepFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("class Deep {}", to: deepFile, encoding: .utf8)
 
       // Create ignore file at root
       let ignoreFile = testDir.appendingPathComponent(".swift-format-ignore")
-      try "level1/level2/level3/**/*.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+      try writeAtomicallyIfPossible("level1/level2/level3/**/*.swift", to: ignoreFile, encoding: .utf8)
 
       let ignoreManager = IgnoreManager()
 

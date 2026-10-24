@@ -13,12 +13,7 @@
 import Foundation
 @_spi(Internal) import SwiftFormat
 import Testing
-
-#if os(WASI)
-private let usesAtomicWriting = false
-#else
-private let usesAtomicWriting = true
-#endif
+import _SwiftFormatTestSupport
 
 @Suite
 struct IgnoreManagerTests {
@@ -31,7 +26,7 @@ struct IgnoreManagerTests {
       try withTempDirectory { tempDir in
         // Create a .swift-format-ignore file
         let ignoreFile = tempDir.appendingPathComponent(".swift-format-ignore")
-        try "*.generated.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.generated.swift", to: ignoreFile, encoding: .utf8)
 
         let manager = IgnoreManager()
         let foundFiles = manager.findIgnoreFiles(for: tempDir.appendingPathComponent("test.swift"))
@@ -62,8 +57,8 @@ struct IgnoreManagerTests {
         let rootIgnore = tempDir.appendingPathComponent(".swift-format-ignore")
         let srcIgnore = srcDir.appendingPathComponent(".swift-format-ignore")
 
-        try "*.generated.swift".write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
-        try "*.test.swift".write(to: srcIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.generated.swift", to: rootIgnore, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.test.swift", to: srcIgnore, encoding: .utf8)
 
         let manager = IgnoreManager()
         let testFile = mainDir.appendingPathComponent("MyFile.swift")
@@ -86,15 +81,15 @@ struct IgnoreManagerTests {
 
         // Create .swift-format-ignore at root level
         let rootIgnore = tempDir.appendingPathComponent(".swift-format-ignore")
-        try "*.generated.swift".write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.generated.swift", to: rootIgnore, encoding: .utf8)
 
         // Create .swift-format configuration file at project level
         let projectConfig = projectDir.appendingPathComponent(".swift-format")
-        try "{}".write(to: projectConfig, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("{}", to: projectConfig, encoding: .utf8)
 
         // Create .swift-format-ignore at src level
         let srcIgnore = srcDir.appendingPathComponent(".swift-format-ignore")
-        try "*.test.swift".write(to: srcIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.test.swift", to: srcIgnore, encoding: .utf8)
 
         let manager = IgnoreManager()
         let testFile = mainDir.appendingPathComponent("MyFile.test.swift")
@@ -134,7 +129,7 @@ struct IgnoreManagerTests {
 
           test/**/*.tmp
           """
-        try content.write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible(content, to: ignoreFile, encoding: .utf8)
 
         let manager = IgnoreManager()
         let patterns = try manager.loadIgnoreFile(at: ignoreFile)
@@ -151,7 +146,7 @@ struct IgnoreManagerTests {
     @Test func loadSkipInvalidPatternInIgnoreFile() throws {
       try withTempDirectory { tempDir in
         let ignoreFile = tempDir.appendingPathComponent(".swift-format-ignore")
-        try "!".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("!", to: ignoreFile, encoding: .utf8)
 
         let manager = IgnoreManager()
         let patterns = try manager.loadIgnoreFile(at: ignoreFile)
@@ -163,7 +158,7 @@ struct IgnoreManagerTests {
     @Test func loadEmptyIgnoreFile() throws {
       try withTempDirectory { tempDir in
         let ignoreFile = tempDir.appendingPathComponent(".swift-format-ignore")
-        try "".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("", to: ignoreFile, encoding: .utf8)
 
         let manager = IgnoreManager()
         let patterns = try manager.loadIgnoreFile(at: ignoreFile)
@@ -191,7 +186,7 @@ struct IgnoreManagerTests {
       try withTempDirectory { tempDir in
         // Create ignore file
         let ignoreFile = tempDir.appendingPathComponent(".swift-format-ignore")
-        try "*.generated.swift".write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.generated.swift", to: ignoreFile, encoding: .utf8)
 
         let manager = IgnoreManager()
 
@@ -212,7 +207,7 @@ struct IgnoreManagerTests {
           *.generated.swift
           !important.generated.swift
           """
-        try content.write(to: ignoreFile, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible(content, to: ignoreFile, encoding: .utf8)
 
         let manager = IgnoreManager()
 
@@ -234,11 +229,11 @@ struct IgnoreManagerTests {
 
         // Root ignore: ignore all .test.swift
         let rootIgnore = tempDir.appendingPathComponent(".swift-format-ignore")
-        try "*.test.swift".write(to: rootIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("*.test.swift", to: rootIgnore, encoding: .utf8)
 
         // Src ignore: allow .test.swift (negation takes precedence)
         let srcIgnore = srcDir.appendingPathComponent(".swift-format-ignore")
-        try "!*.test.swift".write(to: srcIgnore, atomically: usesAtomicWriting, encoding: .utf8)
+        try writeAtomicallyIfPossible("!*.test.swift", to: srcIgnore, encoding: .utf8)
 
         let manager = IgnoreManager()
 
