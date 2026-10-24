@@ -12,13 +12,15 @@
 
 import struct Foundation.URL
 
-/// Writes the contents to the specified URL, using atomic writing when supported.
-public func writeAtomicallyIfPossible(_ content: String, to url: URL, encoding: String.Encoding) throws {
-  #if os(WASI)
-  let supportsAtomicWriting = false
-  #else
-  let supportsAtomicWriting = true
-  #endif
+extension String {
+  /// Writes the contents of the `String` to the specified URL, using atomic writing when supported.
+  public func writeAtomicallyIfPossible(to url: URL, encoding: String.Encoding = .utf8) throws {
+    #if os(WASI)
+    let supportsAtomicWriting = false
+    #else
+    let supportsAtomicWriting = true
+    #endif
 
-  try content.write(to: url, atomically: supportsAtomicWriting, encoding: encoding)
+    try self.write(to: url, atomically: supportsAtomicWriting, encoding: encoding)
+  }
 }
