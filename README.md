@@ -1,6 +1,8 @@
 # kkebo/swift-format
 
-The WebAssembly (WASI) version of `swift-format`. This project's goal is to be merged into [swiftlang/swift-format](https://github.com/swiftlang/swift-format).
+The WebAssembly (WASI) version of `swift-format`. ~~This project's goal is to be merged into [swiftlang/swift-format](https://github.com/swiftlang/swift-format).~~ (Achieved!)
+
+This repository is currently for the distribution of the WASI version of `swift-format`.
 
 ## Download
 
