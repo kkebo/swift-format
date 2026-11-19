@@ -1,10 +1,10 @@
 name: SwiftWasm
 on:
   push:
-    branches: ["wasm32-wasi"]
+    branches: ["wasm32-wasi-release/6.5.x"]
     tags: ["*-wasm32-wasi"]
   pull_request:
-    branches: ["wasm32-wasi"]
+    branches: ["wasm32-wasi-release/6.5.x"]
 env:
   SWIFT_VERSION: main-snapshot-2026-11-01
   STACK_SIZE: 4194304
